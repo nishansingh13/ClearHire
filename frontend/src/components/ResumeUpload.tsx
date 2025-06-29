@@ -1,0 +1,309 @@
+import React, { useState } from 'react'
+
+interface ResumeData {
+  name: string;
+  email: string;
+  phone: string;
+  skills: string[];
+  experience: string[];
+  education: string[];
+  fileName: string;
+  fileSize: number;
+  uploadStatus: string;
+}
+
+function ResumeUpload() {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadResult, setUploadResult] = useState<ResumeData | null>(null);
+  const [error, setError] = useState<string>('');
+  const [dragActive, setDragActive] = useState(false);
+
+  const handleFileSelect = (file: File) => {
+    // Validate file type
+    if (file.type !== 'application/pdf') {
+      setError('Please select a PDF file');
+      return;
+    }
+
+    // Validate file size (10MB limit)
+    if (file.size > 10 * 1024 * 1024) {
+      setError('File size should not exceed 10MB');
+      return;
+    }
+
+    setSelectedFile(file);
+    setError('');
+    setUploadResult(null);
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      handleFileSelect(file);
+    }
+  };
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFileSelect(e.dataTransfer.files[0]);
+    }
+  };
+
+  const uploadResume = async () => {
+    if (!selectedFile) {
+      setError('Please select a file first');
+      return;
+    }
+
+    setUploading(true);
+    setError('');
+
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+
+    try {
+      const response = await fetch('http://localhost:8080/api/resume/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log('Upload successful:', data);
+        setUploadResult(data);
+        setSelectedFile(null);
+      } else {
+        setError(data.error || 'Upload failed');
+      }
+    } catch (err) {
+      console.error('Upload error:', err);
+      setError('Network error. Please check if the backend server is running.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const resetUpload = () => {
+    setSelectedFile(null);
+    setUploadResult(null);
+    setError('');
+    
+    // Trigger file input dialog
+    setTimeout(() => {
+      const fileInput = document.getElementById('file-upload') as HTMLInputElement;
+      if (fileInput) {
+        fileInput.click();
+      }
+    }, 100);
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+        Resume Upload & Parser
+      </h2>
+
+      {/* Upload Area */}
+      {!uploadResult && (
+        <div className="mb-6">
+          <div
+            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+              dragActive
+                ? 'border-blue-500 bg-blue-50'
+                : 'border-gray-300 hover:border-gray-400'
+            }`}
+            onDragEnter={handleDrag}
+            onDragLeave={handleDrag}
+            onDragOver={handleDrag}
+            onDrop={handleDrop}
+          >
+            <div className="mb-4">
+              <svg
+                className="mx-auto h-12 w-12 text-gray-400"
+                stroke="currentColor"
+                fill="none"
+                viewBox="0 0 48 48"
+              >
+                <path
+                  d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+            
+            <p className="text-lg text-gray-600 mb-2">
+              Drag and drop your resume here, or{' '}
+              <label htmlFor="file-upload" className="text-blue-600 hover:text-blue-700 cursor-pointer font-medium">
+                browse
+              </label>
+            </p>
+            <p className="text-sm text-gray-500">PDF files only, up to 10MB</p>
+            
+            <input
+              id="file-upload"
+              type="file"
+              accept=".pdf"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+          </div>
+
+          {/* Selected File Display */}
+          {selectedFile && (
+            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <svg className="h-8 w-8 text-red-600 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
+                  </svg>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">{selectedFile.name}</p>
+                    <p className="text-sm text-gray-500">{(selectedFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setSelectedFile(null)}
+                  className="text-red-600 hover:text-red-800"
+                >
+                  <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Upload Button */}
+          <div className="mt-6 text-center">
+            <button
+              onClick={uploadResume}
+              disabled={!selectedFile || uploading}
+              className={`px-6 py-3 rounded-lg font-medium transition-colors ${
+                !selectedFile || uploading
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-blue-600 text-white hover:bg-blue-700'
+              }`}
+            >
+              {uploading ? 'Parsing Resume...' : 'Upload & Parse Resume'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Error Display */}
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div className="flex">
+            <svg className="h-5 w-5 text-red-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+            </svg>
+            <p className="text-red-800">{error}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Results Display */}
+      {uploadResult && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold text-green-800">Resume Parsed Successfully!</h3>
+            <button
+              onClick={resetUpload}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Upload Another
+            </button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Personal Information */}
+            <div className="bg-white p-4 rounded-lg">
+              <h4 className="font-semibold text-gray-800 mb-3">Personal Information</h4>
+              <div className="space-y-2">
+                <p><span className="font-medium">Name:</span> {uploadResult.name}</p>
+                <p><span className="font-medium">Email:</span> {uploadResult.email}</p>
+                <p><span className="font-medium">Phone:</span> {uploadResult.phone}</p>
+              </div>
+            </div>
+
+            {/* Skills */}
+            <div className="bg-white p-4 rounded-lg">
+              <h4 className="font-semibold text-gray-800 mb-3">Skills</h4>
+              <div className="flex flex-wrap gap-2">
+                {Array.isArray(uploadResult.skills) ? (
+                  uploadResult.skills.map((skill, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                    >
+                      {skill}
+                    </span>
+                  ))
+                ) : (
+                  <p className="text-gray-500 italic">No skills found</p>
+                )}
+              </div>
+            </div>
+
+            {/* Experience */}
+              <div className="bg-white p-4 rounded-lg">
+        <h4 className="font-semibold text-gray-800 mb-3">Experience</h4>
+        <div className="space-y-2">
+          {Array.isArray(uploadResult.experience) && uploadResult.experience.length > 0 ? (
+            uploadResult.experience.map((exp, index) => (
+              <p
+                key={index}
+                className="text-sm text-gray-700 border-l-2 border-gray-300 pl-3"
+                dangerouslySetInnerHTML={{
+                  __html: exp.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>"),
+                }}
+              />
+            ))
+          ) : (
+            <p className="text-gray-500 italic">No experience found</p>
+          )}
+        </div>
+      </div>
+
+
+            {/* Education */}
+            <div className="bg-white p-4 rounded-lg">
+              <h4 className="font-semibold text-gray-800 mb-3">Education</h4>
+              <div className="space-y-2">
+                {Array.isArray(uploadResult.education) ? (
+                  uploadResult.education.map((edu, index) => (
+                    <p key={index} className="text-sm text-gray-700 border-l-2 border-gray-300 pl-3">
+                      {edu}
+                    </p>
+                  ))
+                ) : (
+                  <p className="text-gray-500 italic">No education found</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default ResumeUpload;

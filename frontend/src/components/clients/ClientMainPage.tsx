@@ -1,4 +1,4 @@
-import React from 'react'
+
 import ResumeUpload from '../ResumeUpload'
 import Navbar from '../Navbar'
 // import ClientAccount from './ClientAccount'  // Uncomment when adding account navigation

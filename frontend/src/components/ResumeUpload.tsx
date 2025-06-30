@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useState } from 'react'
 
 interface ResumeData {
@@ -83,6 +84,14 @@ function ResumeUpload() {
       });
 
       const data = await response.json();
+      const save = await axios.post('http://localhost:8080/api/resume/save', data);
+      if(save.status==200){
+        console.log('Resume saved successfully:', save.data);
+      }
+      if (!response.ok) {
+        throw new Error(data.error || 'Upload failed');
+      }
+      
 
       if (response.ok) {
         console.log('Upload successful:', data);
@@ -114,11 +123,7 @@ function ResumeUpload() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-        Resume Upload & Parser
-      </h2>
-
+    <div className="w-full">
       {/* Upload Area */}
       {!uploadResult && (
         <div className="mb-6">
@@ -220,88 +225,72 @@ function ResumeUpload() {
         </div>
       )}
 
-      {/* Results Display */}
+      {/* Success Display with Animated Tick */}
       {uploadResult && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-green-800">Resume Parsed Successfully!</h3>
-            <button
-              onClick={resetUpload}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Upload Another
-            </button>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Personal Information */}
-            <div className="bg-white p-4 rounded-lg">
-              <h4 className="font-semibold text-gray-800 mb-3">Personal Information</h4>
-              <div className="space-y-2">
-                <p><span className="font-medium">Name:</span> {uploadResult.name}</p>
-                <p><span className="font-medium">Email:</span> {uploadResult.email}</p>
-                <p><span className="font-medium">Phone:</span> {uploadResult.phone}</p>
-              </div>
-            </div>
-
-            {/* Skills */}
-            <div className="bg-white p-4 rounded-lg">
-              <h4 className="font-semibold text-gray-800 mb-3">Skills</h4>
-              <div className="flex flex-wrap gap-2">
-                {Array.isArray(uploadResult.skills) ? (
-                  uploadResult.skills.map((skill, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
-                    >
-                      {skill}
-                    </span>
-                  ))
-                ) : (
-                  <p className="text-gray-500 italic">No skills found</p>
-                )}
-              </div>
-            </div>
-
-            {/* Experience */}
-              <div className="bg-white p-4 rounded-lg">
-        <h4 className="font-semibold text-gray-800 mb-3">Experience</h4>
-        <div className="space-y-2">
-          {Array.isArray(uploadResult.experience) && uploadResult.experience.length > 0 ? (
-            uploadResult.experience.map((exp, index) => (
-              <p
-                key={index}
-                className="text-sm text-gray-700 border-l-2 border-gray-300 pl-3"
-                dangerouslySetInnerHTML={{
-                  __html: exp.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>"),
+        <div className="text-center py-8">
+          {/* Animated Check Circle */}
+          <div className="relative inline-flex items-center justify-center w-24 h-24 mb-6">
+            <div className="w-24 h-24 bg-green-100 rounded-full animate-pulse"></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <svg 
+                className="w-12 h-12 text-green-600 animate-bounce" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+                style={{
+                  animation: 'checkmark 0.6s ease-in-out 0.3s both'
                 }}
-              />
-            ))
-          ) : (
-            <p className="text-gray-500 italic">No experience found</p>
-          )}
-        </div>
-      </div>
-
-
-            {/* Education */}
-            <div className="bg-white p-4 rounded-lg">
-              <h4 className="font-semibold text-gray-800 mb-3">Education</h4>
-              <div className="space-y-2">
-                {Array.isArray(uploadResult.education) ? (
-                  uploadResult.education.map((edu, index) => (
-                    <p key={index} className="text-sm text-gray-700 border-l-2 border-gray-300 pl-3">
-                      {edu}
-                    </p>
-                  ))
-                ) : (
-                  <p className="text-gray-500 italic">No education found</p>
-                )}
-              </div>
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={3} 
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
             </div>
           </div>
+
+          {/* Success Message */}
+          <div className="mb-6">
+            <h3 className="text-2xl font-bold text-green-600 mb-2">
+              Resume Uploaded Successfully! ✓
+            </h3>
+            <p className="text-gray-600 text-lg mb-2">
+              Your resume has been processed and saved.
+            </p>
+            <p className="text-blue-600 font-medium">
+              Stay connected for further updates!
+            </p>
+          </div>
+
+          {/* Action Button */}
+          <button
+            onClick={resetUpload}
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+          >
+            Upload Another Resume
+          </button>
         </div>
       )}
+
+      {/* @ts-expect-error This is builtin */}
+      <style jsx>{`
+        @keyframes checkmark {
+          0% {
+            opacity: 0;
+            transform: scale(0.5) rotate(-45deg);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1.2) rotate(-45deg);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+          }
+        }
+      `}</style>
     </div>
   );
 }

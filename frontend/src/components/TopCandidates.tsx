@@ -1,4 +1,5 @@
 import React from 'react';
+import Navbar from './Navbar';
 
 const candidates = [
   {
@@ -29,7 +30,10 @@ const candidates = [
 
 function TopCandidates() {
   return (
+   <>
+    <Navbar />
     <div className="w-full max-w-5xl mx-auto mt-10 px-4">
+      
       <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Top Candidates</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {candidates.map((candidate, idx) => (
@@ -49,6 +53,7 @@ function TopCandidates() {
         ))}
       </div>
     </div>
+    </>
   );
 }
 

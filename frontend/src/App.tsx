@@ -1,19 +1,27 @@
 
 import './App.css'
-import Header from './components/Header'
-import TopCandidates from './components/TopCandidates'
-import ResumeUpload from './components/ResumeUpload'
+import Login from './components/auth/Login'
+import ClientAccount from './components/clients/ClientAccount'
+import ClientMainPage from './components/clients/ClientMainPage'
+import Home from './components/Home'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { Toaster } from 'sonner'
 
 function App() {
  
 
   return (
     <>
-      <Header/>
-      <div className="container mx-auto py-8">
-        <ResumeUpload/>
-      </div>
-      <TopCandidates/>
+    <BrowserRouter>
+    <Toaster position='top-center' richColors />
+    <Routes>
+      <Route path='/' element={<Home/>}/>
+      <Route path='/login' element={<Login/>}/>
+      <Route path='/top-candidates' element={<ClientMainPage/>}/>
+      <Route path='/account' element={<ClientAccount/>}/>
+
+      </Routes>
+      </BrowserRouter>
     </>
   )
 }

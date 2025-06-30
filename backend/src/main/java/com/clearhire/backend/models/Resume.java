@@ -14,10 +14,8 @@ import java.util.List;
 @Document(collection = "resumes")
 public class Resume {
     @Id
-    private String id;
-
-    private String name;
     private String email;
+    private String name;
     private String phone;
     private List<String> skills;
     private List<String> experience;

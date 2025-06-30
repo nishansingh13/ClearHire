@@ -65,13 +65,17 @@ public class ResumeController {
         }
     }
     @PostMapping("api/resume/save")
-    public Resume saveResume(@RequestBody Resume resume){
+    public ResponseEntity<?> saveResume(@RequestBody Resume resume){
         try{
+            if(resume.getName() == null || resume.getName() =="not found" || resume.getEmail() == null || resume.getPhone() == null){
+                throw new IllegalArgumentException("Name, email, and phone are required fields.");
+            }
             Resume savedResume = resumeService.saveResume(resume);
-            return savedResume;
+            return ResponseEntity.ok(savedResume);
         }
         catch (Exception e) {
-            return null;
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "Failed to save resume: " + e.getMessage()));
         }
     }
 

@@ -1,6 +1,8 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 
 function Navbar() {
+  const navigate = useNavigate();
   return (
     <div className='mt-2.5 h-[4rem]' >
         <div className='flex flex-col lg:flex-row justify-between items-center lg:items-start px-4 py-2 gap-4 lg:gap-0'>
@@ -17,7 +19,7 @@ function Navbar() {
         Hire Top Talent
         </button>
 
-            <li className='transition-all hover:underline underline-offset-[15px] cursor-pointer decoration-blue-500 decoration-2 hidden lg:block'>Log in</li>
+            <li  className='transition-all hover:underline underline-offset-[15px] cursor-pointer decoration-blue-500 decoration-2 hidden lg:block' onClick={()=>navigate("/login")}>Log in</li>
         </ul>
         </div>
     </div>

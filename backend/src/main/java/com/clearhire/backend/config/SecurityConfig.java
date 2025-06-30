@@ -19,6 +19,7 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         .cors(cors -> {}) // enable CORS
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/api/**").permitAll()
+            .requestMatchers("/users/**").permitAll()
             .anyRequest().authenticated()
         );
 

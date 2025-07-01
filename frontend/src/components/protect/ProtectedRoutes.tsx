@@ -10,12 +10,13 @@ const ProtectedRoutes = ({ children }: { children: React.ReactNode }) => {
         console.log("auth",authenticated)
     },[authenticated])
   useEffect(() => {
+    setLoading(true);
     axios
       .get("http://localhost:8080/users/token", {
         withCredentials: true, 
       })
       .then((res) => {
-        console.log(res);
+        console.log("data",res);
         setAuthenticated(true);
       })
       .catch(() => {

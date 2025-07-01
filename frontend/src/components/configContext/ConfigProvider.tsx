@@ -5,6 +5,7 @@ interface Config {
   setLoggedIn: (value: boolean) => void;
 }
 
+
 const ConfigContext = createContext<Config | null>(null);
 
 export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {

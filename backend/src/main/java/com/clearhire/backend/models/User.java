@@ -14,6 +14,10 @@ public class User {
     @Id
     private String email;
     private String name;
+    private String phone;
+    private String experience;
+    private String location;
+    private String bio;
     private String password; 
     
 

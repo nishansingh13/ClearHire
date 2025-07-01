@@ -7,8 +7,10 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.CookieValue;
 
 import com.clearhire.backend.Repository.UserRepository;
+import com.clearhire.backend.models.SignUpData;
 import com.clearhire.backend.models.User;
 import com.clearhire.backend.util.JwtUtil;
 
@@ -21,7 +23,7 @@ public class UserService {
     private BCryptPasswordEncoder passwordEncoder;
     @Autowired
     private JwtUtil jwtUtil;
-
+  
     public ResponseEntity<?> registerUser(User user){
         if (userRepository.existsById(user.getEmail())) {
             return ResponseEntity.status(403).body("User already exists");
@@ -81,16 +83,44 @@ public class UserService {
                 .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                 .body("Logout successful");
     }
-
-    public ResponseEntity<?> getToken(){
-         ResponseCookie jwtCookie = ResponseCookie.from("jwt", "")
-                .secure(false) 
-                .path("/")
-                .maxAge(0)
-                .httpOnly(true)
-                .build();
-
-               if(jwtCookie.getValue()!=null || jwtCookie.getValue().length()==0) return ResponseEntity.ok(jwtCookie);
-               return ResponseEntity.status(404).body(null);
+    public boolean validateToken(String token){
+      return jwtUtil.validateToken(token, jwtUtil.extractemail(token));
     }
+
+    public ResponseEntity<?> updateUser(SignUpData user, @CookieValue(value="jwt", defaultValue = "") String jwt) {
+       if(!validateToken(jwt))  return ResponseEntity.status(401).body("Invalid token");
+       if(jwt.isEmpty()) return ResponseEntity.status(401).body("Token is empty");
+       Optional<User> existingUser = userRepository.findById(jwtUtil.extractemail(jwt));
+         if(existingUser.isEmpty()) {
+              return ResponseEntity.status(404).body("User not found");
+         }
+         String location = user.getLocation();
+         String name = user.getName();
+         String phone = user.getPhone();
+         String bio = user.getBio();
+         String experience = user.getExperience();
+         if(!location.isEmpty()) {
+            existingUser.get().setLocation(location);
+         }
+         if(!name.isEmpty()) {
+            existingUser.get().setName(name);
+         }
+        if(!phone.isEmpty()) {
+                existingUser.get().setPhone(phone);
+        }
+        if(!bio.isEmpty()) {
+            existingUser.get().setBio(bio);
+        }
+        if(!experience.isEmpty()) {
+            existingUser.get().setExperience(experience);   
+        }
+         userRepository.save(existingUser.get());
+         return ResponseEntity.ok("User updated successfully");
+
+        
+         
+
+    }
+
+   
 }

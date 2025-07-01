@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import  { useEffect, useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import {toast} from 'sonner';
@@ -8,9 +8,13 @@ import { useConfig } from '../configContext/ConfigProvider';
 interface FormData {
     name : string,
     email : string,
+    phone: string,
+    experience: string,
+    bio: string,
     password : string,
     confirmpassword : string
 }
+
 function Login() {
     
     const {loggedIn,setLoggedIn} = useConfig();
@@ -26,11 +30,19 @@ function Login() {
     const handleSubmit = async(formdata:FormData)=>{
         if (!isLogin) {
             if (formdata.password !== formdata.confirmpassword) {
-                console.log("Passwords do not match");
+                toast.error("Passwords do not match");
                 return;
             }
             if (!formdata.name || formdata.name.trim() === '') {
-                console.log("Name is required");
+                toast.error("Name is required");
+                return;
+            }
+            if (!formdata.phone || formdata.phone.trim() === '') {
+                toast.error("Phone number is required");
+                return;
+            }
+            if (!formdata.experience || formdata.experience.trim() === '') {
+                toast.error("Experience level is required");
                 return;
             }
         }
@@ -38,10 +50,17 @@ function Login() {
         const endpoint = isLogin ? "/users/login" : "/users/register";
         const payload = isLogin 
             ? { email: formdata.email, password: formdata.password }
-            : { name: formdata.name, email: formdata.email, password: formdata.password };
+            : { 
+                name: formdata.name, 
+                email: formdata.email, 
+                phone: formdata.phone,
+                experience: formdata.experience,
+                bio: formdata.bio,
+                password: formdata.password 
+              };
 
         try {
-            setLoading(!loggedIn);
+            setLoading(true);
             const res = await axios.post(`http://localhost:8080${endpoint}`, payload, {
                 withCredentials: true
             });
@@ -57,6 +76,9 @@ function Login() {
               setFormData({
                 name: '',
                 email: '',
+                phone: '',
+                experience: '',
+                bio: '',
                 password: '',
                 confirmpassword: ''
               });
@@ -66,7 +88,7 @@ function Login() {
             console.log(data);
        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error:any) {
-            toast.error(isLogin ? `${error?.response.data} ` : `${error?.response?.data}`);
+            toast.error(isLogin ? `${error?.response?.data} ` : `${error?.response?.data}`);
            
         }
         finally {
@@ -77,12 +99,16 @@ function Login() {
     const [formdata,setFormData] = useState<FormData>({
         name: '',
         email: '',
+        phone: '',
+        experience: '',
+        bio: '',
         password: '',
         confirmpassword: ''
     });
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#D1D6E1] to-gray-100 flex items-center justify-center p-4">
-      <div className="max-w-md w-full space-y-8 bg-white rounded-xl shadow-2xl p-8">
+      <div className="max-w-md md:max-w-2xl w-full space-y-8 bg-white rounded-xl shadow-2xl p-8">
         {/* Header */}
         <div className="text-center">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">ClearHire</h1>
@@ -122,12 +148,12 @@ function Login() {
 
         {/* Login/Signup Form */}
         <form className="mt-8 space-y-6">
-          <div className="space-y-4">
+          <div className={`grid gap-4 ${!isLogin ? 'md:grid-cols-2' : 'grid-cols-1'}`}>
             {/* Name Field (Only for Signup) */}
             {!isLogin && (
-              <div>
+              <div className="md:col-span-2">
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                  Full Name
+                  Full Name *
                 </label>
                 <input
                   id="name"
@@ -149,9 +175,9 @@ function Login() {
             )}
 
             {/* Email Field */}
-            <div>
+            <div className={!isLogin ? 'md:col-span-2' : ''}>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address
+                Email Address *
               </label>
               <input
                 id="email"
@@ -171,10 +197,63 @@ function Login() {
               />
             </div>
 
+            {/* Phone Field (Only for Signup) */}
+            {!isLogin && (
+              <div>
+                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                  Phone Number *
+                </label>
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  autoComplete="tel"
+                  value={formdata?.phone || ''}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      phone: e.target.value
+                    }))
+                  }
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-600 focus:border-transparent outline-none transition-all duration-200 text-gray-900 placeholder-gray-500"
+                  placeholder="Enter your phone number"
+                />
+              </div>
+            )}
+
+            {/* Experience Field (Only for Signup) */}
+            {!isLogin && (
+              <div>
+                <label htmlFor="experience" className="block text-sm font-medium text-gray-700 mb-2">
+                  Experience Level *
+                </label>
+                <select
+                  id="experience"
+                  name="experience"
+                  value={formdata?.experience || ''}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      experience: e.target.value
+                    }))
+                  }
+                  required
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-600 focus:border-transparent outline-none transition-all duration-200 text-gray-900"
+                >
+                  <option value="">Select your experience level</option>
+                  <option value="Entry Level (0-2 years)">Entry Level (0-2 years)</option>
+                  <option value="Mid Level (3-5 years)">Mid Level (3-5 years)</option>
+                  <option value="Senior Level (5-8 years)">Senior Level (5-8 years)</option>
+                  <option value="Lead/Principal (8+ years)">Lead/Principal (8+ years)</option>
+                </select>
+              </div>
+            )}
+
             {/* Password Field */}
-            <div>
+            <div className={!isLogin ? '' : 'md:col-span-2'}>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Password
+                Password *
               </label>
               <div className="relative">
                 <input
@@ -207,16 +286,17 @@ function Login() {
             {!isLogin && (
               <div>
                 <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                  Confirm Password
+                  Confirm Password *
                 </label>
                 <div className="relative">
                   <input
                     id="confirmPassword"
                     name="confirmPassword"
                     type={showConfirmPassword ? 'text' : 'password'}
+                    value={formdata?.confirmpassword || ''}
                     onChange={(e) =>
                       setFormData((prev) => ({
-                        ...prev!,
+                        ...prev,
                         confirmpassword: e.target.value
                       }))
                     }
@@ -233,6 +313,29 @@ function Login() {
                     {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
                 </div>
+              </div>
+            )}
+
+            {/* Bio Field (Only for Signup) */}
+            {!isLogin && (
+              <div className="md:col-span-2">
+                <label htmlFor="bio" className="block text-sm font-medium text-gray-700 mb-2">
+                  Professional Bio
+                </label>
+                <textarea
+                  id="bio"
+                  name="bio"
+                  rows={3}
+                  value={formdata?.bio || ''}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      bio: e.target.value
+                    }))
+                  }
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-600 focus:border-transparent outline-none transition-all duration-200 text-gray-900 placeholder-gray-500 resize-none"
+                  placeholder="Tell us about your professional background..."
+                />
               </div>
             )}
           </div>
@@ -253,7 +356,7 @@ function Login() {
               </div>
 
               <div className="text-sm">
-                <a href="#" className="font-medium text-blue-500 hover:text-blue-600 transition-colors duration-200">
+                <a href="#" className="font-medium text-green-600 hover:text-green-700 transition-colors duration-200">
                   Forgot your password?
                 </a>
               </div>
@@ -266,19 +369,17 @@ function Login() {
               onClick={() => handleSubmit(formdata)}
               disabled={loading}
               type="button"
-className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-lg font-bold rounded-lg text-white 
-  ${loading ? 'bg-green-700 cursor-not-allowed opacity-50' : 'bg-green-600 '} 
-  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-600 transition-all duration-200 transform hover:scale-[1.02]`}
+              className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-lg font-bold rounded-lg text-white 
+                ${loading ? 'bg-green-700 cursor-not-allowed opacity-50' : 'bg-green-600 hover:bg-green-700'} 
+                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-600 transition-all duration-200 transform hover:scale-[1.02]`}
             >
-             
               {loading 
-          ? isLogin 
-            ? 'Signing In...' 
-            : 'Creating Account...' 
-          : isLogin 
-            ? 'Sign In' 
-            : 'Create Account'}
-
+                ? isLogin 
+                  ? 'Signing In...' 
+                  : 'Creating Account...' 
+                : isLogin 
+                  ? 'Sign In' 
+                  : 'Create Account'}
             </button>
           </div>
 
@@ -325,7 +426,7 @@ className={`group relative w-full flex justify-center py-3 px-4 border border-tr
             <button
               type="button"
               onClick={() => setIsLogin(!isLogin)}
-              className="font-medium text-blue-500 hover:text-blue-600 transition-colors duration-200"
+              className="font-medium text-green-600 hover:text-green-700 transition-colors duration-200"
             >
               {isLogin ? 'Sign up for free' : 'Sign in here'}
             </button>

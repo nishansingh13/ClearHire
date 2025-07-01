@@ -1,9 +1,57 @@
-
 import ResumeUpload from '../ResumeUpload'
 import Navbar from '../Navbar'
+import { jobRolesByCategory } from '../roles/roles'
+import { useState } from 'react'; // Removed unused 'useEffect' import
 // import ClientAccount from './ClientAccount'  // Uncomment when adding account navigation
 
 function ClientMainPage() {
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [data, setData] = useState<string[]>([]);
+  const [selectedRole, setSelectedRole] = useState<string>('');
+  // Add state to track search input value
+  const [searchInput, setSearchInput] = useState<string>('');
+  
+  const handleInputChange = (query: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = query.target.value.toLowerCase();
+    setSearchInput(inputValue); // Track the input value
+    
+    if (inputValue.trim() === '') {
+      // If input is empty, show roles from selected category or empty array
+     setData(
+    selectedCategory && selectedCategory in jobRolesByCategory
+    ? jobRolesByCategory[selectedCategory as keyof typeof jobRolesByCategory]
+    : []
+);
+
+      return;
+    }
+    
+    // If category is selected, search only within that category
+    if (selectedCategory) {
+      const categoryRoles = jobRolesByCategory[selectedCategory as keyof typeof jobRolesByCategory] || [];
+      const filteredRoles = categoryRoles.filter(role =>
+        role.toLowerCase().includes(inputValue)
+      );
+      setData(filteredRoles);
+    } else {
+      // If no category selected and user is searching, don't show results
+      // This prevents showing search results when "Select a category" is chosen
+      setData([]);
+    }
+  }
+  
+  const handleSearch = (query: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCategory(query.target.value);
+    setSearchInput(''); // Clear search input when category changes
+    setData(query.target.value ? jobRolesByCategory[query.target.value as keyof typeof jobRolesByCategory] || [] : []);
+  }
+  
+  const handleRoleClick = (role: string) => {
+    console.log('Selected role:', role);
+    // Toggle selection - if same role clicked, deselect it
+    setSelectedRole(selectedRole === role ? '' : role);
+  }
+
   return (
     <>
       <Navbar/>
@@ -23,6 +71,115 @@ function ClientMainPage() {
             </p>
           </div>
 
+          {/* Job Category Search Section */}
+          <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-semibold text-gray-800 mb-2">Explore Job Categories</h2>
+              <p className="text-gray-600">Select a category to see available job roles</p>
+            </div>
+            
+            <div className="max-w-md mx-auto space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Search Keywords
+                </label>
+                <input 
+                  type="text"
+                  value={searchInput}
+                  onChange={(e)=>handleInputChange(e)}
+                  placeholder="Enter keywords (e.g., developer, manager, analyst)" 
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-colors"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Job Category
+                </label>
+                <select 
+                  onChange={(e) => handleSearch(e)} 
+                  value={selectedCategory}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-colors bg-white"
+                >
+                  <option value="">Select a category</option>
+                  {Object.keys(jobRolesByCategory).map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Job Roles Display */}
+            {data.length > 0 && (
+              <div className="mt-8">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">
+                  {/* Dynamic title based on search context */}
+                  {selectedCategory ? `Available Roles in ${selectedCategory}` : 'Search Results'}
+                </h3>
+                {/* Show selected role info */}
+                {selectedRole && (
+                  <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-center">
+                    <p className="text-sm text-green-700">
+                      <span className="font-medium">Selected Role:</span> {selectedRole}
+                    </p>
+                  </div>
+                )}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
+                  {data.map((role, index) => (
+                    <div
+                      key={index}
+                      onClick={() => handleRoleClick(role)}
+                      className={`${
+                        selectedRole === role 
+                          ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-300 ring-2 ring-green-200' 
+                          : 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200'
+                      } border rounded-lg p-4 hover:shadow-md hover:scale-105 transition-all duration-200 cursor-pointer group`}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className={`w-10 h-10 ${
+                          selectedRole === role 
+                            ? 'bg-green-100 group-hover:bg-green-200' 
+                            : 'bg-blue-100 group-hover:bg-blue-200'
+                        } rounded-full flex items-center justify-center transition-colors`}>
+                          {selectedRole === role ? (
+                            <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                          ) : (
+                            <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m8 6V9a2 2 0 00-2-2H6a2 2 0 00-2 2v3M7 7h10" />
+                            </svg>
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <p className={`text-sm font-medium ${
+                            selectedRole === role 
+                              ? 'text-green-800 group-hover:text-green-700' 
+                              : 'text-gray-800 group-hover:text-blue-700'
+                          } transition-colors`}>
+                            {role}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {selectedRole === role ? 'Selected' : 'Click to select'}
+                          </p>
+                        </div>
+                        <svg className={`w-4 h-4 ${
+                          selectedRole === role 
+                            ? 'text-green-400 group-hover:text-green-500' 
+                            : 'text-gray-400 group-hover:text-blue-500'
+                        } transition-colors`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        
           {/* Main Content Grid */}
           <div className="grid lg:grid-cols-2 gap-12 items-start">
             
@@ -40,7 +197,16 @@ function ClientMainPage() {
                 </p>
               </div>
               
-              <ResumeUpload/>
+              {/* Role selection validation message */}
+              {!selectedRole && (
+                <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                  <p className="text-sm text-amber-700 text-center">
+                    <span className="font-medium">Please select a job role above before uploading your resume</span>
+                  </p>
+                </div>
+              )}
+              
+              <ResumeUpload selectedRole={selectedRole} />
               
               <div className="mt-6 p-4 bg-blue-50 rounded-lg">
                 <h3 className="font-medium text-blue-800 mb-2">Tips for better results:</h3>

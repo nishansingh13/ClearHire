@@ -6,7 +6,6 @@ import { useConfig } from '../configContext/ConfigProvider';
 import {  useNavigate } from 'react-router';
 
 interface UserProfile {
-  id: string;
   name: string;
   email: string;
   phone: string;
@@ -20,13 +19,11 @@ function ClientAccount() {
   const {setLoggedIn} = useConfig();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [editing, setEditing] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
   const navigate = useNavigate();
   const [editForm, setEditForm] = useState<UserProfile>({
-    id: '',
     name: '',
     email: '',
     phone: '',
@@ -56,29 +53,31 @@ function ClientAccount() {
 };
 
   const fetchUserProfile = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get('http://localhost:8080/api/user/profile');
-      setUserProfile(response.data);
-      setEditForm(response.data);
-    } catch (err) {
-      const mockUser: UserProfile = {
-        id: '1',
-        name: 'John Doe',
-        email: 'john.doe@example.com',
-        phone: '+1 (555) 123-4567',
-        location: 'San Francisco, CA',
-        bio: 'Experienced software developer with a passion for creating innovative solutions.',
-        skills: ['JavaScript', 'React', 'Node.js', 'Python', 'SQL'],
-        experience: '5+ years'
-      };
-      setUserProfile(mockUser);
-      setEditForm(mockUser);
-      console.error('Error fetching user profile:', err);
-    } finally {
-      setLoading(false);
+    // Using mock data instead of API call
+    const res = await axios.get("http://localhost:8080/users/profile", {
+      withCredentials: true
+    });
+    const data = res.data;
+    console.log(data);
+    if(res.status == 200) {
+    setUserProfile({
+      name : data?.name,
+      email: data?.email,
+      experience: data?.experience || '',
+      phone: data?.phone || '',
+      location: data?.location || '',
+      bio: data?.bio || '',
+
+    });
+    setEditForm({
+       name : data?.name,
+      email: data?.email,
+      phone: data?.phone || '',
+      location: data?.location || '',
+      bio: data?.bio || '',
+    });
     }
-  };
+  }; 
 
   const handleInputChange = (field: keyof UserProfile, value: string | string[]) => {
     setEditForm(prev => ({
@@ -97,20 +96,34 @@ function ClientAccount() {
     setError('');
     setSuccess('');
 
+    // Simulate saving with mock logic
     try {
-      const response = await axios.put('http://localhost:8080/api/user/profile', editForm);
-      setUserProfile(editForm);
+      // Simulate API delay
+      // await new Promise(resolve => setTimeout(resolve, 1000));
+      await axios.put("http://localhost:8080/users/update", {
+        name: editForm?.name,
+        location: editForm?.location,
+        phone: editForm?.phone,
+        bio: editForm?.bio,
+        experience: editForm?.experience
+      }, {
+        withCredentials: true
+          
+      });
+      setUserProfile({
+        name: editForm.name,
+        email: editForm.email,
+        phone: editForm.phone,
+        location: editForm.location,
+        experience: editForm.experience,
+        bio: editForm.bio,
+      });
       setEditing(false);
       setSuccess('Profile updated successfully!');
       setTimeout(() => setSuccess(''), 3000);
-      console.log('Profile updated successfully:', response.data);
     } catch (err) {
       console.error('Save error:', err);
       setError('Failed to save profile. Please try again.');
-      setUserProfile(editForm);
-      setEditing(false);
-      setSuccess('Profile updated successfully!');
-      setTimeout(() => setSuccess(''), 3000);
     } finally {
       setSaving(false);
     }
@@ -118,7 +131,6 @@ function ClientAccount() {
 
   const cancelEdit = () => {
     setEditForm(userProfile || {
-      id: '',
       name: '',
       email: '',
       phone: '',
@@ -132,51 +144,6 @@ function ClientAccount() {
     setSuccess('');
   };
 
-  if (loading) {
-    return (
-      <>
-        <Navbar/>
-        <div className="bg-gray-50 min-h-screen">
-          <div className="container mx-auto px-4 py-12">
-            <div className="max-w-6xl mx-auto">
-              <div className="bg-white rounded-2xl shadow-xl p-8">
-                <div className="animate-pulse">
-                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
-                    <div className="flex items-center mb-4 lg:mb-0">
-                      <div className="w-20 h-20 bg-gray-300 rounded-full"></div>
-                      <div className="ml-6">
-                        <div className="h-8 bg-gray-300 rounded w-64 mb-3"></div>
-                        <div className="h-5 bg-gray-300 rounded w-48"></div>
-                      </div>
-                    </div>
-                    <div className="h-12 bg-gray-300 rounded w-32"></div>
-                  </div>
-                  <div className="grid lg:grid-cols-2 gap-8">
-                    <div className="space-y-6">
-                      <div className="h-6 bg-gray-300 rounded w-48"></div>
-                      <div className="space-y-4">
-                        <div className="h-4 bg-gray-300 rounded w-full"></div>
-                        <div className="h-4 bg-gray-300 rounded w-3/4"></div>
-                        <div className="h-4 bg-gray-300 rounded w-1/2"></div>
-                      </div>
-                    </div>
-                    <div className="space-y-6">
-                      <div className="h-6 bg-gray-300 rounded w-48"></div>
-                      <div className="space-y-4">
-                        <div className="h-4 bg-gray-300 rounded w-full"></div>
-                        <div className="h-4 bg-gray-300 rounded w-3/4"></div>
-                        <div className="h-4 bg-gray-300 rounded w-1/2"></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </>
-    );
-  }
 
   return (
     <>

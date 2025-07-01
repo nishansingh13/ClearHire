@@ -53,11 +53,11 @@ public class UserService {
         
         // Create HTTP-only cookie with JWT token
         ResponseCookie jwtCookie = ResponseCookie.from("jwt", token)
-                .httpOnly(true)
                 .secure(false) // Set to true in production with HTTPS
                 .path("/")
                 .maxAge(24 * 60 * 60) // 24 hours
                 .sameSite("Lax")
+                .httpOnly(true)
                 .build();
         
         // Return response with cookie header
@@ -71,10 +71,10 @@ public class UserService {
     // Logout method to clear JWT cookie
     public ResponseEntity<?> logoutUser() {
         ResponseCookie jwtCookie = ResponseCookie.from("jwt", "")
-                .httpOnly(true)
-                .secure(false) // Set to true in production with HTTPS
+                .secure(false) 
                 .path("/")
-                .maxAge(0) // Expire immediately
+                .maxAge(0)
+                .httpOnly(true)
                 .build();
         
         return ResponseEntity.ok()
@@ -82,25 +82,15 @@ public class UserService {
                 .body("Logout successful");
     }
 
-    // Validate JWT token from cookie
-    public boolean validateTokenFromCookie(String cookieValue) {
-        if (cookieValue == null || cookieValue.isEmpty()) {
-            return false;
-        }
-        try {
-            String email = jwtUtil.extractemail(cookieValue);
-            return jwtUtil.validateToken(cookieValue, email);
-        } catch (Exception e) {
-            return false;
-        }
-    }
+    public ResponseEntity<?> getToken(){
+         ResponseCookie jwtCookie = ResponseCookie.from("jwt", "")
+                .secure(false) 
+                .path("/")
+                .maxAge(0)
+                .httpOnly(true)
+                .build();
 
-    // Extract email from JWT cookie
-    public String getemailFromCookie(String cookieValue) {
-        try {
-            return jwtUtil.extractemail(cookieValue);
-        } catch (Exception e) {
-            return null;
-        }
+               if(jwtCookie.getValue()!=null || jwtCookie.getValue().length()==0) return ResponseEntity.ok(jwtCookie);
+               return ResponseEntity.status(404).body(null);
     }
 }

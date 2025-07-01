@@ -2,6 +2,7 @@ package com.clearhire.backend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,5 +42,13 @@ public class UserController {
       String email = loginRequest.getEmail();
       String password = loginRequest.getPassword();
       return userService.loginUser(email, password);
-}
+    }
+    @GetMapping("/users/logout")
+    public ResponseEntity<?> logoutUser(){
+       return userService.logoutUser();
+    }
+    @GetMapping("/users/token")
+    public ResponseEntity<?> getToken(){
+        return userService.getToken();
+    }
 }

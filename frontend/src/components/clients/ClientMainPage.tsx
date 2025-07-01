@@ -138,24 +138,7 @@ function ClientMainPage() {
                 </div>
               </div>
 
-              {/* Stats */}
-              <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-xl p-8 text-white">
-                <h2 className="text-2xl font-semibold mb-6">Join Thousands of Successful Candidates</h2>
-                <div className="grid grid-cols-3 gap-4 text-center">
-                  <div>
-                    <div className="text-3xl font-bold mb-1">10K+</div>
-                    <div className="text-blue-100 text-sm">Resumes Processed</div>
-                  </div>
-                  <div>
-                    <div className="text-3xl font-bold mb-1">500+</div>
-                    <div className="text-blue-100 text-sm">Partner Companies</div>
-                  </div>
-                  <div>
-                    <div className="text-3xl font-bold mb-1">95%</div>
-                    <div className="text-blue-100 text-sm">Match Accuracy</div>
-                  </div>
-                </div>
-              </div>
+           
             </div>
           </div>
         </div>

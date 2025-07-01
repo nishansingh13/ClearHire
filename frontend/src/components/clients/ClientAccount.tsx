@@ -1,6 +1,9 @@
 import  { useState, useEffect } from 'react';
 import axios from 'axios';
 import Navbar from '../Navbar';
+import { toast } from 'sonner';
+import { useConfig } from '../configContext/ConfigProvider';
+import {  useNavigate } from 'react-router';
 
 interface UserProfile {
   id: string;
@@ -14,12 +17,14 @@ interface UserProfile {
 }
 
 function ClientAccount() {
+  const {setLoggedIn} = useConfig();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
+  const navigate = useNavigate();
   const [editForm, setEditForm] = useState<UserProfile>({
     id: '',
     name: '',
@@ -33,7 +38,22 @@ function ClientAccount() {
 
   useEffect(() => {
     fetchUserProfile();
+    
   }, []);
+ const handleLogout = async () => {
+  try {
+    const res = await axios.get('http://localhost:8080/users/logout', {
+      withCredentials: true
+    });
+    if (res.status === 200) {
+      toast.success("Successfully Logout");
+      navigate("/")
+      setLoggedIn(false);
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   const fetchUserProfile = async () => {
     try {
@@ -114,36 +134,39 @@ function ClientAccount() {
 
   if (loading) {
     return (
-      <div className="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
-        <div className="container mx-auto px-4 py-12">
-          <div className="max-w-6xl mx-auto">
-            <div className="bg-white rounded-2xl shadow-xl p-8">
-              <div className="animate-pulse">
-                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
-                  <div className="flex items-center mb-4 lg:mb-0">
-                    <div className="w-20 h-20 bg-gray-300 rounded-full"></div>
-                    <div className="ml-6">
-                      <div className="h-8 bg-gray-300 rounded w-64 mb-3"></div>
-                      <div className="h-5 bg-gray-300 rounded w-48"></div>
+      <>
+        <Navbar/>
+        <div className="bg-gray-50 min-h-screen">
+          <div className="container mx-auto px-4 py-12">
+            <div className="max-w-6xl mx-auto">
+              <div className="bg-white rounded-2xl shadow-xl p-8">
+                <div className="animate-pulse">
+                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
+                    <div className="flex items-center mb-4 lg:mb-0">
+                      <div className="w-20 h-20 bg-gray-300 rounded-full"></div>
+                      <div className="ml-6">
+                        <div className="h-8 bg-gray-300 rounded w-64 mb-3"></div>
+                        <div className="h-5 bg-gray-300 rounded w-48"></div>
+                      </div>
                     </div>
+                    <div className="h-12 bg-gray-300 rounded w-32"></div>
                   </div>
-                  <div className="h-12 bg-gray-300 rounded w-32"></div>
-                </div>
-                <div className="grid lg:grid-cols-2 gap-8">
-                  <div className="space-y-6">
-                    <div className="h-6 bg-gray-300 rounded w-48"></div>
-                    <div className="space-y-4">
-                      <div className="h-4 bg-gray-300 rounded w-full"></div>
-                      <div className="h-4 bg-gray-300 rounded w-3/4"></div>
-                      <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+                  <div className="grid lg:grid-cols-2 gap-8">
+                    <div className="space-y-6">
+                      <div className="h-6 bg-gray-300 rounded w-48"></div>
+                      <div className="space-y-4">
+                        <div className="h-4 bg-gray-300 rounded w-full"></div>
+                        <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                        <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+                      </div>
                     </div>
-                  </div>
-                  <div className="space-y-6">
-                    <div className="h-6 bg-gray-300 rounded w-48"></div>
-                    <div className="space-y-4">
-                      <div className="h-4 bg-gray-300 rounded w-full"></div>
-                      <div className="h-4 bg-gray-300 rounded w-3/4"></div>
-                      <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+                    <div className="space-y-6">
+                      <div className="h-6 bg-gray-300 rounded w-48"></div>
+                      <div className="space-y-4">
+                        <div className="h-4 bg-gray-300 rounded w-full"></div>
+                        <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                        <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -151,14 +174,14 @@ function ClientAccount() {
             </div>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
     <>
     <Navbar/>
-    <div className="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div className="bg-gray-50 min-h-screen">
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">
           {/* Hero Header */}
@@ -166,9 +189,15 @@ function ClientAccount() {
             <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
               Account Profile
             </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-6">
               Manage your personal information and keep your profile up to date for better job matching
             </p>
+            <button 
+              onClick={handleLogout}
+              className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200"
+            >
+              Logout
+            </button>
           </div>
 
           {/* Main Profile Card */}
@@ -177,8 +206,8 @@ function ClientAccount() {
             <div className="bg-white px-8 py-12 border-b border-gray-200">
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
                 <div className="flex flex-col lg:flex-row lg:items-center mb-6 lg:mb-0">
-                  <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mb-4 lg:mb-0 lg:mr-6 mx-auto lg:mx-0">
-                    <svg className="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-4 lg:mb-0 lg:mr-6 mx-auto lg:mx-0">
+                    <svg className="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                   </div>
@@ -198,7 +227,7 @@ function ClientAccount() {
                 {!editing ? (
                   <button
                     onClick={() => setEditing(true)}
-                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 font-semibold shadow-lg transform hover:scale-105 mx-auto lg:mx-0"
+                    className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 font-semibold shadow-lg transform hover:scale-105 mx-auto lg:mx-0"
                   >
                     <svg className="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -273,8 +302,8 @@ function ClientAccount() {
                 {/* Personal Information Card */}
                 <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 shadow-lg border border-gray-100">
                   <div className="flex items-center mb-6">
-                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                      <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                      <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
                     </div>
@@ -290,7 +319,7 @@ function ClientAccount() {
                           type="text"
                           value={editForm.name}
                           onChange={(e) => handleInputChange('name', e.target.value)}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-gray-400"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 hover:border-gray-400 outline-none"
                           placeholder="Enter your full name"
                         />
                       ) : (
@@ -308,7 +337,7 @@ function ClientAccount() {
                           type="email"
                           value={editForm.email}
                           onChange={(e) => handleInputChange('email', e.target.value)}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-gray-400"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 hover:border-gray-400 outline-none"
                           placeholder="Enter your email address"
                         />
                       ) : (
@@ -326,7 +355,7 @@ function ClientAccount() {
                           type="tel"
                           value={editForm.phone}
                           onChange={(e) => handleInputChange('phone', e.target.value)}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-gray-400"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 hover:border-gray-400 outline-none"
                           placeholder="Enter your phone number"
                         />
                       ) : (
@@ -344,7 +373,7 @@ function ClientAccount() {
                           type="text"
                           value={editForm.location || ''}
                           onChange={(e) => handleInputChange('location', e.target.value)}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 hover:border-gray-400"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 hover:border-gray-400 outline-none"
                           placeholder="City, State/Country"
                         />
                       ) : (
@@ -357,10 +386,10 @@ function ClientAccount() {
                 </div>
 
                 {/* Professional Information Card */}
-                <div className="bg-gradient-to-br from-purple-50 to-white rounded-xl p-6 shadow-lg border border-gray-100">
+                <div className="bg-gradient-to-br from-green-50 to-white rounded-xl p-6 shadow-lg border border-gray-100">
                   <div className="flex items-center mb-6">
-                    <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
-                      <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                      <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2V6" />
                       </svg>
                     </div>
@@ -376,7 +405,7 @@ function ClientAccount() {
                           value={editForm.bio || ''}
                           onChange={(e) => handleInputChange('bio', e.target.value)}
                           rows={4}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-gray-400 resize-none"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 hover:border-gray-400 resize-none outline-none"
                           placeholder="Tell us about your professional background..."
                         />
                       ) : (
@@ -393,7 +422,7 @@ function ClientAccount() {
                         <select
                           value={editForm.experience || ''}
                           onChange={(e) => handleInputChange('experience', e.target.value)}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-gray-400"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 hover:border-gray-400 outline-none"
                         >
                           <option value="">Select experience level</option>
                           <option value="Entry Level (0-2 years)">Entry Level (0-2 years)</option>
@@ -417,7 +446,7 @@ function ClientAccount() {
                             value={editForm.skills?.join(', ') || ''}
                             onChange={(e) => handleSkillsChange(e.target.value)}
                             rows={3}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 hover:border-gray-400 resize-none"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 hover:border-gray-400 resize-none outline-none"
                             placeholder="JavaScript, React, Node.js, Python, SQL..."
                           />
                           <p className="text-xs text-gray-500 mt-2 flex items-center">
@@ -434,7 +463,7 @@ function ClientAccount() {
                               {userProfile.skills.map((skill, index) => (
                                 <span
                                   key={index}
-                                  className="px-3 py-1 bg-gradient-to-r from-purple-100 to-blue-100 text-purple-800 text-sm rounded-full font-medium shadow-sm hover:shadow-md transition-shadow duration-200"
+                                  className="px-3 py-1 bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 text-sm rounded-full font-medium shadow-sm hover:shadow-md transition-shadow duration-200"
                                 >
                                   {skill}
                                 </span>
@@ -452,31 +481,31 @@ function ClientAccount() {
 
               {/* Tips Section */}
               {editing && (
-                <div className="mt-12 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+                <div className="mt-12 p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
                   <div className="flex items-start">
-                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0 mt-1">
-                      <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0 mt-1">
+                      <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                       </svg>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-blue-800 mb-3">💡 Tips for a standout profile:</h3>
+                      <h3 className="font-semibold text-green-800 mb-3">💡 Tips for a standout profile:</h3>
                       <div className="grid md:grid-cols-2 gap-3">
                         <div className="flex items-start">
-                          <span className="text-blue-600 mr-2">•</span>
-                          <span className="text-sm text-blue-700">Keep your information current for better job matching</span>
+                          <span className="text-green-600 mr-2">•</span>
+                          <span className="text-sm text-green-700">Keep your information current for better job matching</span>
                         </div>
                         <div className="flex items-start">
-                          <span className="text-blue-600 mr-2">•</span>
-                          <span className="text-sm text-blue-700">Add relevant skills that match your expertise</span>
+                          <span className="text-green-600 mr-2">•</span>
+                          <span className="text-sm text-green-700">Add relevant skills that match your expertise</span>
                         </div>
                         <div className="flex items-start">
-                          <span className="text-blue-600 mr-2">•</span>
-                          <span className="text-sm text-blue-700">Write a compelling bio highlighting your strengths</span>
+                          <span className="text-green-600 mr-2">•</span>
+                          <span className="text-sm text-green-700">Write a compelling bio highlighting your strengths</span>
                         </div>
                         <div className="flex items-start">
-                          <span className="text-blue-600 mr-2">•</span>
-                          <span className="text-sm text-blue-700">Ensure contact information is accurate and professional</span>
+                          <span className="text-green-600 mr-2">•</span>
+                          <span className="text-sm text-green-700">Ensure contact information is accurate and professional</span>
                         </div>
                       </div>
                     </div>

@@ -275,7 +275,7 @@ function ResumeUpload() {
       )}
 
       {/* @ts-expect-error This is builtin */}
-      <style jsx>{`
+      <style jsx="">{`
         @keyframes checkmark {
           0% {
             opacity: 0;

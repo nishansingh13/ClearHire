@@ -1,8 +1,9 @@
 import axios from 'axios';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import {toast} from 'sonner';
+import { useConfig } from '../configContext/ConfigProvider';
 
 interface FormData {
     name : string,
@@ -11,6 +12,11 @@ interface FormData {
     confirmpassword : string
 }
 function Login() {
+    
+    const {loggedIn,setLoggedIn} = useConfig();
+    useEffect(()=>{
+      console.log(loggedIn)
+    },[loggedIn])
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [isLogin, setIsLogin] = useState(true);
@@ -35,7 +41,7 @@ function Login() {
             : { name: formdata.name, email: formdata.email, password: formdata.password };
 
         try {
-            setLoading(true);
+            setLoading(!loggedIn);
             const res = await axios.post(`http://localhost:8080${endpoint}`, payload, {
                 withCredentials: true
             });
@@ -46,6 +52,7 @@ function Login() {
                 return;
             }
             else {
+              setLoggedIn(true);
               toast.success(isLogin ? "Login successful" : "Signup successful");
               setFormData({
                 name: '',

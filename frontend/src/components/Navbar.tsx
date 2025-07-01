@@ -1,28 +1,125 @@
-import React from 'react'
+import { Link } from 'react-router-dom';
+import  {  useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useConfig } from './configContext/ConfigProvider';
+import axios from 'axios';
+import { Loader2 } from 'lucide-react';
 
 function Navbar() {
-  const navigate = useNavigate();
-  return (
-    <div className='mt-2.5 h-[4rem]' >
-        <div className='flex flex-col lg:flex-row justify-between items-center lg:items-start px-4 py-2 gap-4 lg:gap-0'>
-        <ul className='flex flex-wrap gap-3 lg:gap-6 text-sm justify-center lg:justify-start'>
-            <li className='text-xl lg:text-2xl cursor-pointer font-bold'>ClearHire</li>
-            <li className='py-2 transition-all hover:underline underline-offset-[15px] decoration-blue-500 decoration-2 cursor-pointer hidden lg:block'>Top 1%</li>
-            <li className='py-2 transition-all hover:underline underline-offset-[15px] decoration-blue-500 decoration-2 cursor-pointer hidden lg:block'>Other Services </li>
-            <li className='py-2 transition-all hover:underline underline-offset-[15px] cursor-pointer decoration-blue-500 decoration-2 hidden lg:block' >Clients</li>
-            <li className='py-2 transition-all hover:underline underline-offset-[15px] cursor-pointer decoration-blue-500 decoration-2 hidden lg:block'>Blog</li>
-        </ul>
-        <ul className='flex flex-wrap gap-3 lg:gap-6 text-sm py-2 decoration-blue-500 decoration-2 justify-center lg:justify-end items-center'>
-            <li className='transition-all hover:underline underline-offset-[15px] cursor-pointer decoration-blue-500 decoration-2 hidden lg:block'> Apply as a Talent</li>
-                <button type="button" className="text-sm lg:text-base text-white font-bold bg-green-600 cursor-pointer py-2 px-3 lg:px-4 rounded-md hover:bg-green-700">
-        Hire Top Talent
-        </button>
+    const { loggedIn,setLoggedIn } = useConfig();
+    const [loading,setLoading] = useState(false);
+    const validateLogin = async()=>{
 
-            <li  className='transition-all hover:underline underline-offset-[15px] cursor-pointer decoration-blue-500 decoration-2 hidden lg:block' onClick={()=>navigate("/login")}>Log in</li>
-        </ul>
+      try{
+        setLoading(true);
+        const res = await axios.get("http://localhost:8080/users/token");
+        if(res.status==200){
+          setLoggedIn(true);
+        }
+      }
+      catch(err){
+        console.error(err);
+      }
+      finally{
+        setLoading(false);
+      }
+    }
+    useEffect(()=>{
+      validateLogin();
+    },[])
+
+  const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  if(loading) return (<>
+    <div className="w-full h-screen flex justify-center items-center">  <Loader2 className='animate-spin w-[4rem] h-[4rem] md:w-[10rem] md:h-[10rem] text-green-600'/></div>
+
+  </>)
+  return (
+    <nav className='bg-white shadow-sm border-b'>
+      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+        <div className='flex justify-between items-center h-16'>
+          {/* Logo */}
+          <div className='flex-shrink-0'>
+            <h1 className='text-2xl font-bold text-gray-900 cursor-pointer' onClick={()=>navigate("/")}>ClearHire</h1>
+          </div>
+          <div className='hidden md:block'>
+            <div className='ml-10 flex items-baseline space-x-8'>
+              <Link to="/top-candidates" className='text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors'>Top 1%</Link>
+              <Link to ="/blog" className='text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors'>Blog</Link>
+              <a href="#" className='text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors'>Clients</a>
+              <a href="#" className='text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors'>Other Services</a>
+            </div>
+          </div>
+
+          {/* Desktop Actions */}
+          <div className='hidden md:flex items-center space-x-4'>
+            <Link to ="/apply" className='text-gray-700 hover:text-blue-600 text-sm font-medium transition-colors'>Apply as Talent</Link>
+            <button className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors" onClick={() => navigate("/top-candidates")}>
+              Hire Top Talent
+            </button>
+            {!loggedIn?(
+                <button 
+              onClick={() => navigate("/login")}
+              className='text-gray-700 hover:text-blue-600 text-sm font-medium transition-colors cursor-pointer'
+            >
+              Log in
+            </button>
+            ):(<Link to="/account">
+               <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mb-4 lg:mb-0 lg:mr-6 mx-auto lg:mx-0">
+                    <svg className="w-12 h-12 p-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </div>
+            </Link>)}
+          
+          </div>
+
+          {/* Mobile menu button */}
+          <div className='md:hidden'>
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className='inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-blue-600 hover:bg-gray-100 focus:outline-none'
+            >
+              <svg className='h-6 w-6' stroke='currentColor' fill='none' viewBox='0 0 24 24'>
+                {isMenuOpen ? (
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
+                ) : (
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M4 6h16M4 12h16M4 18h16' />
+                )}
+              </svg>
+            </button>
+          </div>
         </div>
-    </div>
+      </div>
+
+      {/* Mobile Navigation Menu */}
+      {isMenuOpen && (
+        <div className='md:hidden bg-white border-t border-gray-200'>
+          <div className='px-2 pt-2 pb-3 space-y-1'>
+            <a href="#" className='text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium transition-colors'>Top 1%</a>
+            <a href="#" className='text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium transition-colors'>Other Services</a>
+            <a href="#" className='text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium transition-colors' >Clients</a>
+            <a href="#" className='text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium transition-colors'>Blog</a>
+            <a href="#" className='text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium transition-colors'>Apply as a Talent</a>
+            <div className='px-3 py-2 space-y-2'>
+              <button className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors">
+                Hire Top Talent
+              </button>
+              {!loggedIn ?(
+              <button 
+                onClick={() => navigate("/login")}
+                className='w-full text-gray-700 hover:text-blue-600 text-sm font-medium py-2 px-4 border border-gray-300 rounded-md transition-colors'
+              >
+                Log in
+              </button>
+              ) :(
+                <>dsd</>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </nav>
   )
 }
 

@@ -291,8 +291,14 @@ The application automatically adapts to different environments:
 ### Common Issues
 
 #### Authentication Issues
-- **Problem**: Cookies not being set in production
+- **Problem**: Cookies not being set in production/incognito/mobile Safari
 - **Solution**: Ensure `secure: true` and `sameSite: "None"` for cross-origin deployments
+- **Note**: `sameSite: "None"` is required for cross-origin cookies to work in modern browsers
+
+#### Cross-Origin Cookie Issues
+- **Problem**: Authentication fails in incognito mode or mobile Safari
+- **Solution**: Backend uses `sameSite("None")` and `secure(true)` cookie settings
+- **Requirement**: HTTPS is mandatory when using `sameSite("None")`
 
 #### Resume Parsing Failures
 - **Problem**: AI parsing returns incomplete data
@@ -311,6 +317,13 @@ The application automatically adapts to different environments:
 - Check backend logs for detailed error messages
 - Verify environment variables are loaded correctly
 - Test API endpoints using tools like Postman
+
+### Testing Authentication
+- **Local Development**: Works with HTTP and `sameSite: "Lax"`
+- **Production/Cross-Origin**: Requires HTTPS and `sameSite: "None"`
+- **Incognito Mode**: Test cross-origin cookie behavior
+- **Mobile Safari**: Known to be strict with cross-origin cookies
+- **Cookie Inspection**: Use browser DevTools → Application → Cookies to verify
 
 ## 🤝 Contributing
 

@@ -16,7 +16,6 @@ export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
   // Check if user is logged in on app load
   useEffect(() => {
     const token = localStorage.getItem('authToken');
-    console.log('ConfigProvider checking token:', token);
     if (token) {
       setLoggedIn(true);
       console.log('User is logged in');

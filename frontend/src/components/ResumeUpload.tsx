@@ -99,7 +99,9 @@ function ResumeUpload({ selectedRole }: ResumeUploadProps) {
       const data = await response.json();
    
       const save = await axios.post(`${server}/api/resume/save`, data);
-    
+      if(save.status==200){
+        console.log("Loading..");
+      }
       if (!response.ok) {
         throw new Error(data.error || 'Upload failed');
       }

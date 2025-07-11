@@ -1,4 +1,4 @@
-import React from 'react'
+
 import headerImage from '../../public/header_resume.svg';
 function SubHeading() {
   return (

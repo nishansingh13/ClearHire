@@ -55,10 +55,10 @@ public class UserService {
         
         // Create HTTP-only cookie with JWT token
         ResponseCookie jwtCookie = ResponseCookie.from("jwt", token)
-                .secure(true) // Set to true in production with HTTPS
+                .secure(true) // Required for cross-origin cookies
                 .path("/")
                 .maxAge(24 * 60 * 60) // 24 hours
-                .sameSite("Lax")
+                .sameSite("None") // Required for cross-origin cookies
                 .httpOnly(true)
                 .build();
         
@@ -76,6 +76,7 @@ public class UserService {
                 .secure(true) 
                 .path("/")
                 .maxAge(0)
+                .sameSite("None") // Required for cross-origin cookies
                 .httpOnly(true)
                 .build();
         

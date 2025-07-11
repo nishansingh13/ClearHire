@@ -27,7 +27,7 @@ function Login() {
 
     useEffect(() => {
       if (loggedIn) {
-        navigate("/top-candidates", { replace: true });
+        navigate("/", { replace: true });
       }
     }, [loggedIn, navigate]);
     
@@ -94,9 +94,8 @@ function Login() {
                   confirmpassword: ''
                 });
                 
-                // Navigate immediately after setting state
-                console.log('Attempting navigation to /top-candidates');
-                navigate("/top-candidates", { replace: true });
+              
+                navigate("/", { replace: true });
                 
               } else if (!isLogin) {
                 toast.success("Signup successful");

@@ -17,9 +17,6 @@ const ProtectedRoutes = ({ children }: { children: React.ReactNode }) => {
         setLoading(false);
         return;
       }
-
-      // If token exists, assume user is logged in
-      // The API interceptor will handle invalid tokens
       setLoggedIn(true);
       setLoading(false);
     };

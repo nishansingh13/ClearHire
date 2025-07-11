@@ -37,7 +37,6 @@ function ClientAccount() {
     try {
       const res = await API.get(`${server}/users/profile`);
       const data = res.data;
-      console.log(data);
       if(res.status == 200) {
         setUserProfile({
           name : data?.name,
@@ -101,8 +100,7 @@ function ClientAccount() {
 
     // Simulate saving with mock logic
     try {
-      // Simulate API delay
-      // await new Promise(resolve => setTimeout(resolve, 1000));
+     
       await API.put(`${server}/users/update`, {
         name: editForm?.name,
         location: editForm?.location,

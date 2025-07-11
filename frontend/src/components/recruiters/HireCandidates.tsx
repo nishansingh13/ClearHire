@@ -52,7 +52,6 @@ function HireCandidates() {
       try {
         setLoading(true);
         const res = await axios.get(`${server}/api/resume/getResumeData`);
-        console.log('Resume data fetched:', res.data);
         setResumeData(res.data || []);
       } catch (error) {
         console.error('Error fetching resume data:', error);

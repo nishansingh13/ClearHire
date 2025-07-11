@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import  {  useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useConfig } from './configContext/ConfigProvider';
-import { Loader2 } from 'lucide-react';
+// import { Loader2 } from 'lucide-react';
 import API from '../utils/api';
 
 function Navbar() {
@@ -40,7 +40,7 @@ function Navbar() {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   if(loading) return (<>
-    <div className="w-full h-screen flex justify-center items-center">  <Loader2 className='animate-spin w-[4rem] h-[4rem] md:w-[10rem] md:h-[10rem] text-green-600'/></div>
+    <div className="w-full h-screen flex justify-center items-center"><div className="animate-spin rounded-full w-[4rem] h-[4rem] md:w-[8rem] md:h-[8rem] border-b-2 border-green-600 mx-auto mb-4"></div></div>
 
   </>)
   return (

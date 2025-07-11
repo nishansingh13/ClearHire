@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { Loader2 } from "lucide-react";
+// import { Loader2 } from "lucide-react";
 import { useConfig } from "../configContext/ConfigProvider";
 
 const ProtectedRoutes = ({ children }: { children: React.ReactNode }) => {
@@ -25,7 +25,7 @@ const ProtectedRoutes = ({ children }: { children: React.ReactNode }) => {
   }, [setLoggedIn]);
 
     if(loading) return (<>
-    <div className="w-full h-screen flex justify-center items-center">  <Loader2 className='animate-spin w-[4rem] h-[4rem] md:w-[10rem] md:h-[10rem] text-green-600'/></div>
+    <div className="w-full h-screen flex justify-center items-center"><div className="animate-spin rounded-full w-[4rem] h-[4rem] md:w-[10rem] md:h-[10rem] border-b-2 border-yellow-800 mx-auto mb-4"></div></div>
 
   </>)
   if (!loggedIn) return <Navigate to="/login" replace />;

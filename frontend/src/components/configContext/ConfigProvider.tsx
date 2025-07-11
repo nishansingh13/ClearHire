@@ -18,7 +18,6 @@ export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
     const token = localStorage.getItem('authToken');
     if (token) {
       setLoggedIn(true);
-      console.log('User is logged in');
     } else {
       console.log('No token found, user not logged in');
     }

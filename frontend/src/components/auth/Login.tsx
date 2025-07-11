@@ -67,7 +67,7 @@ function Login() {
             setLoading(true);
             const res = await axios.post(`${server}${endpoint}`, payload);
             
-            console.log('Login response:', res);
+    
             if(res.status !== 200){
                 console.log(isLogin ? "Error in login" : "Error in signup");
                 return;
@@ -78,7 +78,7 @@ function Login() {
                 localStorage.setItem('authToken', res.data.token);
                 localStorage.setItem('userEmail', res.data.email);
                 localStorage.setItem('userName', res.data.name);
-                console.log('Token stored:', res.data.token);
+               
                 
                 // Update global auth state
                 setLoggedIn(true);
@@ -110,8 +110,7 @@ function Login() {
                 });
               }
             }
-            const data = res.data;
-            console.log('Response data:', data);
+           
        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error:any) {
             toast.error(isLogin ? `${error?.response?.data} ` : `${error?.response?.data}`);

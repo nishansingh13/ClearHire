@@ -3,6 +3,7 @@ import { createContext, useContext, useState } from "react";
 interface Config {
   loggedIn: boolean;
   setLoggedIn: (value: boolean) => void;
+  server : string;
 }
 
 
@@ -10,9 +11,10 @@ const ConfigContext = createContext<Config | null>(null);
 
 export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
   const [loggedIn, setLoggedIn] = useState(false);
+  const server= "https://clearhire.onrender.com";
 
   return (
-    <ConfigContext.Provider value={{ loggedIn, setLoggedIn }}>
+    <ConfigContext.Provider value={{ loggedIn, setLoggedIn , server }}>
       {children}
     </ConfigContext.Provider>
   );

@@ -16,7 +16,7 @@ interface UserProfile {
 }
 
 function ClientAccount() {
-  const {setLoggedIn} = useConfig();
+  const {setLoggedIn, server} = useConfig();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -36,10 +36,9 @@ function ClientAccount() {
   useEffect(() => {
     fetchUserProfile();
     
-  }, []);
- const handleLogout = async () => {
-  try {
-    const res = await axios.get('http://localhost:8080/users/logout', {
+  }, []);  const handleLogout = async () => {
+    try {
+      const res = await axios.get(`${server}/users/logout`, {
       withCredentials: true
     });
     if (res.status === 200) {
@@ -54,7 +53,7 @@ function ClientAccount() {
 
   const fetchUserProfile = async () => {
     // Using mock data instead of API call
-    const res = await axios.get("http://localhost:8080/users/profile", {
+    const res = await axios.get(`${server}/users/profile`, {
       withCredentials: true
     });
     const data = res.data;
@@ -100,7 +99,7 @@ function ClientAccount() {
     try {
       // Simulate API delay
       // await new Promise(resolve => setTimeout(resolve, 1000));
-      await axios.put("http://localhost:8080/users/update", {
+      await axios.put(`${server}/users/update`, {
         name: editForm?.name,
         location: editForm?.location,
         phone: editForm?.phone,

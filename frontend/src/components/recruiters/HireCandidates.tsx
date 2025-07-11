@@ -2,6 +2,7 @@ import axios from 'axios';
 import Navbar from '../Navbar';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useConfig } from '../configContext/ConfigProvider';
 
 interface Resume {
   email: string;
@@ -27,6 +28,7 @@ function HireCandidates() {
   const [resumeData, setResumeData] = useState<Resume[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { server } = useConfig();
   const getDefaultAvatar = () => {
     return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiByeD0iNTAiIGZpbGw9IiNGM0Y0RjYiLz4KPHN2ZyB4PSIyNSIgeT0iMjAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSIjOUI5QkE0Ij4KICA8cGF0aCBkPSJNMTIgMTJjMi4yMSAwIDQtMS43OSA0LTRzLTEuNzktNC00LTQtNCA1LjItNCA0IDEuNzkgNCA0IDR6bTAgMmMtMi42NyAwLTggMS4zNC04IDR2MmgxNnYtMmMwLTIuNjYtNS4zMy00LTgtNHoiLz4KICA8L3N2Zz4KPC9zdmc+';
   };
@@ -49,7 +51,7 @@ function HireCandidates() {
     const getResumes = async () => {
       try {
         setLoading(true);
-        const res = await axios.get("http://localhost:8080/api/resume/getResumeData");
+        const res = await axios.get(`${server}/api/resume/getResumeData`);
         console.log('Resume data fetched:', res.data);
         setResumeData(res.data || []);
       } catch (error) {

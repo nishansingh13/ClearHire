@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { useState } from 'react'
+import { useConfig } from './configContext/ConfigProvider';
 
 interface ResumeData {
   name: string;
@@ -24,6 +25,7 @@ function ResumeUpload({ selectedRole }: ResumeUploadProps) {
   const [uploadResult, setUploadResult] = useState<ResumeData | null>(null);
   const [error, setError] = useState<string>('');
   const [dragActive, setDragActive] = useState(false);
+  const { server } = useConfig();
 
   const handleFileSelect = (file: File) => {
     // Validate file type
@@ -89,14 +91,14 @@ function ResumeUpload({ selectedRole }: ResumeUploadProps) {
     formData.append('selectedRole', selectedRole);
 
     try {
-      const response = await fetch('http://localhost:8080/api/resume/upload', {
+      const response = await fetch(`${server}/api/resume/upload`, {
         method: 'POST',
         body: formData,
       });
 
       const data = await response.json();
       console.log(data);
-      const save = await axios.post('http://localhost:8080/api/resume/save', data);
+      const save = await axios.post(`${server}/api/resume/save`, data);
       if(save.status==200){
         console.log('Resume saved successfully:', save.data);
       }

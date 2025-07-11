@@ -17,7 +17,7 @@ interface FormData {
 
 function Login() {
     
-    const {setLoggedIn} = useConfig();
+    const {setLoggedIn, server} = useConfig();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [isLogin, setIsLogin] = useState(true);
@@ -58,7 +58,7 @@ function Login() {
 
         try {
             setLoading(true);
-            const res = await axios.post(`http://localhost:8080${endpoint}`, payload, {
+            const res = await axios.post(`${server}${endpoint}`, payload, {
                 withCredentials: true
             });
             

@@ -2,6 +2,7 @@ import axios from 'axios';
 import Navbar from '../Navbar';
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useConfig } from '../configContext/ConfigProvider';
 
 interface Resume {
   email: string;
@@ -16,6 +17,7 @@ interface Resume {
 function ProfileView() {
   const { email } = useParams<{ email: string }>();
   const navigate = useNavigate();
+  const { server } = useConfig();
   const [resumeData, setResumeData] = useState<Resume | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,7 +52,7 @@ function ProfileView() {
 
       try {
         setLoading(true);
-        const res = await axios.post('http://localhost:8080/api/resume/getResumeByEmail', {
+        const res = await axios.post(`${server}/api/resume/getResumeByEmail`, {
           email: decodeURIComponent(email)
         });
         

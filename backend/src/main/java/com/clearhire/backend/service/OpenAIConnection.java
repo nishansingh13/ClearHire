@@ -11,13 +11,41 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
-// import io.github.cdimascio.dotenv.Dotenv;
+import io.github.cdimascio.dotenv.Dotenv;
 
 @Service
 public class OpenAIConnection {
     private static final String API_URL = "https://models.github.ai/inference";
-    private static final String API_KEY = System.getenv("OPENAI_API_KEY");
     private static final String MODEL_NAME = "openai/gpt-4.1";
+    
+    // Load environment variables with fallback
+    private static final Dotenv dotenv = Dotenv.configure()
+            .directory(".")
+            .ignoreIfMalformed()
+            .ignoreIfMissing()
+            .load();
+    
+    private static final String API_KEY = getApiKey();
+    
+    private static String getApiKey() {
+        // First try environment variable (for production)
+        String key = System.getenv("OPENAI_API_KEY");
+        if (key != null && !key.isEmpty()) {
+            return key;
+        }
+        
+        // Then try .env file (for local development)
+        try {
+            key = dotenv.get("OPENAI_API_KEY");
+            if (key != null && !key.isEmpty()) {
+                return key;
+            }
+        } catch (Exception e) {
+            System.err.println("Warning: Could not load .env file: " + e.getMessage());
+        }
+        
+        throw new RuntimeException("OPENAI_API_KEY not found in environment variables or .env file");
+    }
     public  Map<String,Object> extractResumeData(String resumeText) throws Exception {
         HttpClient client = HttpClient.newHttpClient();
         JSONObject body = new JSONObject();

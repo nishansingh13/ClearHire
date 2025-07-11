@@ -55,7 +55,7 @@ public class UserService {
         
         // Create HTTP-only cookie with JWT token
         ResponseCookie jwtCookie = ResponseCookie.from("jwt", token)
-                .secure(false) // Set to true in production with HTTPS
+                .secure(true) // Set to true in production with HTTPS
                 .path("/")
                 .maxAge(24 * 60 * 60) // 24 hours
                 .sameSite("Lax")
@@ -73,7 +73,7 @@ public class UserService {
     // Logout method to clear JWT cookie
     public ResponseEntity<?> logoutUser() {
         ResponseCookie jwtCookie = ResponseCookie.from("jwt", "")
-                .secure(false) 
+                .secure(true) 
                 .path("/")
                 .maxAge(0)
                 .httpOnly(true)

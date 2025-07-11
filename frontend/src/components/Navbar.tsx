@@ -8,11 +8,15 @@ import { Loader2 } from 'lucide-react';
 function Navbar() {
     const { loggedIn,setLoggedIn } = useConfig();
     const [loading,setLoading] = useState(false);
-    const validateLogin = async()=>{
+  
+    useEffect(()=>{
+        const validateLogin = async()=>{
 
       try{
         setLoading(true);
-        const res = await axios.get("http://localhost:8080/users/token");
+        const res = await axios.get("http://localhost:8080/users/token",{
+          withCredentials:true
+        });
         if(res.status==200){
           setLoggedIn(true);
         }
@@ -24,7 +28,6 @@ function Navbar() {
         setLoading(false);
       }
     }
-    useEffect(()=>{
       validateLogin();
     },[])
 

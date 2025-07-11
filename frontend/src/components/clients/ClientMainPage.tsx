@@ -8,9 +8,7 @@ function ClientMainPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [data, setData] = useState<string[]>([]);
   const [selectedRole, setSelectedRole] = useState<string>('');
-  // Add state to track search input value
   const [searchInput, setSearchInput] = useState<string>('');
-  
   const handleInputChange = (query: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = query.target.value.toLowerCase();
     setSearchInput(inputValue); // Track the input value
@@ -26,7 +24,6 @@ function ClientMainPage() {
       return;
     }
     
-    // If category is selected, search only within that category
     if (selectedCategory) {
       const categoryRoles = jobRolesByCategory[selectedCategory as keyof typeof jobRolesByCategory] || [];
       const filteredRoles = categoryRoles.filter(role =>
@@ -34,8 +31,6 @@ function ClientMainPage() {
       );
       setData(filteredRoles);
     } else {
-      // If no category selected and user is searching, don't show results
-      // This prevents showing search results when "Select a category" is chosen
       setData([]);
     }
   }
@@ -48,7 +43,6 @@ function ClientMainPage() {
   
   const handleRoleClick = (role: string) => {
     console.log('Selected role:', role);
-    // Toggle selection - if same role clicked, deselect it
     setSelectedRole(selectedRole === role ? '' : role);
   }
 

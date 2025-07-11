@@ -6,7 +6,8 @@ import ClientMainPage from './components/clients/ClientMainPage'
 import Home from './components/Home'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { Toaster } from 'sonner'
-import TopCandidates from './components/clients/TopCandidates'
+import HireCandidates from './components/recruiters/HireCandidates'
+import ProfileView from './components/recruiters/ProfileView'
 import Blog from './components/extras/Blog'
 import ProtectedRoutes from './components/protect/ProtectedRoutes'
 function App() {
@@ -22,7 +23,8 @@ function App() {
       <Route path='/login' element={<Login/>}/>
       <Route path='/apply' element={<ProtectedRoutes><ClientMainPage/></ProtectedRoutes>}/>
       <Route path='/account' element={<ProtectedRoutes><ClientAccount/></ProtectedRoutes>}/>
-      <Route path = "/top-candidates" element={<ProtectedRoutes><TopCandidates/></ProtectedRoutes>}/>
+      <Route path = "/top-candidates" element={<ProtectedRoutes><HireCandidates/></ProtectedRoutes>}/>
+      <Route path="/profile/:email" element={<ProtectedRoutes><ProfileView/></ProtectedRoutes>}/>
       <Route path="/blog" element={<Blog/>}/>
 
       </Routes>

@@ -99,19 +99,19 @@ public class UserService {
          String phone = user.getPhone();
          String bio = user.getBio();
          String experience = user.getExperience();
-         if(!location.isEmpty()) {
+         if(location != null && !location.isEmpty()) {
             existingUser.get().setLocation(location);
          }
-         if(!name.isEmpty()) {
+         if(name != null && !name.isEmpty()) {
             existingUser.get().setName(name);
          }
-        if(!phone.isEmpty()) {
+        if(phone != null && !phone.isEmpty()) {
                 existingUser.get().setPhone(phone);
         }
-        if(!bio.isEmpty()) {
+        if(bio != null && !bio.isEmpty()) {
             existingUser.get().setBio(bio);
         }
-        if(!experience.isEmpty()) {
+        if(experience != null && !experience.isEmpty()) {
             existingUser.get().setExperience(experience);   
         }
          userRepository.save(existingUser.get());

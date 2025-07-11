@@ -20,7 +20,7 @@ public class OpenAIConnection {
     private static final String MODEL_NAME = "openai/gpt-4.1";
     public  Map<String,Object> extractResumeData(String resumeText) throws Exception {
         HttpClient client = HttpClient.newHttpClient();
-       JSONObject body = new JSONObject();
+        JSONObject body = new JSONObject();
         body.put("model", MODEL_NAME);
         body.put("temperature", 0.7);
         body.put("max_tokens", 4000);

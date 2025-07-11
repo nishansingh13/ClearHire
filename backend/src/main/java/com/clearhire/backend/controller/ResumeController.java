@@ -1,11 +1,13 @@
 package com.clearhire.backend.controller;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,7 +27,7 @@ public class ResumeController {
     private ResumeService resumeService;
     
     @PostMapping("/api/resume/upload")
-        public ResponseEntity<?> uploadResume(@RequestParam("file") MultipartFile file) {
+        public ResponseEntity<?> uploadResume(@RequestParam("file") MultipartFile file, @RequestParam("selectedRole") String selectedRole) {
             try {
                 if (file.isEmpty()) {
                     return ResponseEntity.badRequest()
@@ -50,9 +52,7 @@ public class ResumeController {
                     .body(Map.of("error", "Failed to parse resume data"));
             }
             
-            resumeData.put("fileName", file.getOriginalFilename());
-            resumeData.put("fileSize", file.getSize());
-            resumeData.put("uploadStatus", "success");
+            resumeData.put("role",selectedRole);
             
             return ResponseEntity.ok(resumeData);
             
@@ -76,6 +76,27 @@ public class ResumeController {
         catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("error", "Failed to save resume: " + e.getMessage()));
+        }
+    }
+    @GetMapping("api/resume/getResumeData")
+    public ResponseEntity<?> getResume(){
+            List<Resume> list = resumeService.getResume();
+            if (list == null || list.isEmpty()) {
+                return ResponseEntity.status(404).build();
+            }
+
+            else return ResponseEntity.ok(list);
+    }
+
+    @PostMapping("api/resume/getResumeByEmail")
+    public ResponseEntity<?> getResumeByEmail(@RequestBody Map<String,String> payload){
+        
+        Resume resume = resumeService.getResumeByEmail(payload.get("email"));
+        if (resume == null) {
+            return ResponseEntity.status(404).build();
+        
+        } else {
+            return ResponseEntity.ok(resume);
         }
     }
 

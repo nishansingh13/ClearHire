@@ -1,5 +1,5 @@
 import axios from 'axios';
-import  { useEffect, useState } from 'react'
+import  {  useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import {toast} from 'sonner';
@@ -17,10 +17,7 @@ interface FormData {
 
 function Login() {
     
-    const {loggedIn,setLoggedIn} = useConfig();
-    useEffect(()=>{
-      console.log(loggedIn)
-    },[loggedIn])
+    const {setLoggedIn} = useConfig();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [isLogin, setIsLogin] = useState(true);

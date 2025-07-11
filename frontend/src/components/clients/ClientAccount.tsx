@@ -44,7 +44,7 @@ function ClientAccount() {
     });
     if (res.status === 200) {
       toast.success("Successfully Logout");
-      navigate("/")
+      navigate("/login")
       setLoggedIn(false);
     }
   } catch (err) {

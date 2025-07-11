@@ -11,6 +11,7 @@ interface ResumeData {
   fileName: string;
   fileSize: number;
   uploadStatus: string;
+  selectedRole : string;
 }
 
 interface ResumeUploadProps {
@@ -85,7 +86,6 @@ function ResumeUpload({ selectedRole }: ResumeUploadProps) {
 
     const formData = new FormData();
     formData.append('file', selectedFile);
-    // Add selected role to the form data
     formData.append('selectedRole', selectedRole);
 
     try {
@@ -95,6 +95,7 @@ function ResumeUpload({ selectedRole }: ResumeUploadProps) {
       });
 
       const data = await response.json();
+      console.log(data);
       const save = await axios.post('http://localhost:8080/api/resume/save', data);
       if(save.status==200){
         console.log('Resume saved successfully:', save.data);

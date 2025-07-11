@@ -1,5 +1,5 @@
 import axios from 'axios';
-import  {  useState } from 'react'
+import  {  useState, useEffect } from 'react'
 import { Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import {toast} from 'sonner';
@@ -17,12 +17,19 @@ interface FormData {
 
 function Login() {
     
-    const {setLoggedIn, server} = useConfig();
+    const {loggedIn, setLoggedIn, server} = useConfig();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [isLogin, setIsLogin] = useState(true);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    
+
+    useEffect(() => {
+      if (loggedIn) {
+        navigate("/top-candidates", { replace: true });
+      }
+    }, [loggedIn, navigate]);
     
     const handleSubmit = async(formdata:FormData)=>{
         if (!isLogin) {
@@ -58,31 +65,54 @@ function Login() {
 
         try {
             setLoading(true);
-            const res = await axios.post(`${server}${endpoint}`, payload, {
-                withCredentials: true
-            });
+            const res = await axios.post(`${server}${endpoint}`, payload);
             
-            console.log(res);
+            console.log('Login response:', res);
             if(res.status !== 200){
                 console.log(isLogin ? "Error in login" : "Error in signup");
                 return;
             }
             else {
-              setLoggedIn(true);
-              toast.success(isLogin ? "Login successful" : "Signup successful");
-              setFormData({
-                name: '',
-                email: '',
-                phone: '',
-                experience: '',
-                bio: '',
-                password: '',
-                confirmpassword: ''
-              });
-              navigate("/top-candidates")
+              if (isLogin && res.data.token) {
+                // Store authentication data in localStorage
+                localStorage.setItem('authToken', res.data.token);
+                localStorage.setItem('userEmail', res.data.email);
+                localStorage.setItem('userName', res.data.name);
+                console.log('Token stored:', res.data.token);
+                
+                // Update global auth state
+                setLoggedIn(true);
+                
+                toast.success("Login successful");
+                setFormData({
+                  name: '',
+                  email: '',
+                  phone: '',
+                  experience: '',
+                  bio: '',
+                  password: '',
+                  confirmpassword: ''
+                });
+                
+                // Navigate immediately after setting state
+                console.log('Attempting navigation to /top-candidates');
+                navigate("/top-candidates", { replace: true });
+                
+              } else if (!isLogin) {
+                toast.success("Signup successful");
+                setFormData({
+                  name: '',
+                  email: '',
+                  phone: '',
+                  experience: '',
+                  bio: '',
+                  password: '',
+                  confirmpassword: ''
+                });
+              }
             }
             const data = res.data;
-            console.log(data);
+            console.log('Response data:', data);
        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error:any) {
             toast.error(isLogin ? `${error?.response?.data} ` : `${error?.response?.data}`);

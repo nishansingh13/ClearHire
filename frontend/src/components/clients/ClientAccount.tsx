@@ -1,9 +1,9 @@
-import  { useState, useEffect } from 'react';
-import axios from 'axios';
+import  { useState, useEffect, useCallback } from 'react';
 import Navbar from '../Navbar';
 import { toast } from 'sonner';
 import { useConfig } from '../configContext/ConfigProvider';
 import {  useNavigate } from 'react-router';
+import API from '../../utils/api';
 
 interface UserProfile {
   name: string;
@@ -33,50 +33,54 @@ function ClientAccount() {
     experience: ''
   });
 
+  const fetchUserProfile = useCallback(async () => {
+    try {
+      const res = await API.get(`${server}/users/profile`);
+      const data = res.data;
+      console.log(data);
+      if(res.status == 200) {
+        setUserProfile({
+          name : data?.name,
+          email: data?.email,
+          experience: data?.experience || '',
+          phone: data?.phone || '',
+          location: data?.location || '',
+          bio: data?.bio || '',
+
+        });
+        setEditForm({
+           name : data?.name,
+          email: data?.email,
+          phone: data?.phone || '',
+          location: data?.location || '',
+          bio: data?.bio || '',
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      toast.error('Failed to load profile');
+    }
+  }, [server]);
+
   useEffect(() => {
     fetchUserProfile();
     
-  }, []);  const handleLogout = async () => {
+  }, [fetchUserProfile]);
+
+  const handleLogout = async () => {
     try {
-      const res = await axios.get(`${server}/users/logout`, {
-      withCredentials: true
-    });
-    if (res.status === 200) {
+      // Clear localStorage
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('userEmail');
+      localStorage.removeItem('userName');
+      
       toast.success("Successfully Logout");
       navigate("/login")
       setLoggedIn(false);
-    }
   } catch (err) {
     console.error(err);
   }
-};
-
-  const fetchUserProfile = async () => {
-    // Using mock data instead of API call
-    const res = await axios.get(`${server}/users/profile`, {
-      withCredentials: true
-    });
-    const data = res.data;
-    console.log(data);
-    if(res.status == 200) {
-    setUserProfile({
-      name : data?.name,
-      email: data?.email,
-      experience: data?.experience || '',
-      phone: data?.phone || '',
-      location: data?.location || '',
-      bio: data?.bio || '',
-
-    });
-    setEditForm({
-       name : data?.name,
-      email: data?.email,
-      phone: data?.phone || '',
-      location: data?.location || '',
-      bio: data?.bio || '',
-    });
-    }
-  }; 
+}; 
 
   const handleInputChange = (field: keyof UserProfile, value: string | string[]) => {
     setEditForm(prev => ({
@@ -99,15 +103,12 @@ function ClientAccount() {
     try {
       // Simulate API delay
       // await new Promise(resolve => setTimeout(resolve, 1000));
-      await axios.put(`${server}/users/update`, {
+      await API.put(`${server}/users/update`, {
         name: editForm?.name,
         location: editForm?.location,
         phone: editForm?.phone,
         bio: editForm?.bio,
         experience: editForm?.experience
-      }, {
-        withCredentials: true
-          
       });
       setUserProfile({
         name: editForm.name,

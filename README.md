@@ -12,7 +12,7 @@ ClearHire is a modern, AI-powered recruitment platform that revolutionizes the h
 - **Automated Data Extraction**: Extract personal information, skills, experience, and education
 - **Role-based Matching**: Select job roles for targeted matching
 - **Profile Management**: Update personal information, bio, and contact details
-- **Secure Authentication**: JWT-based authentication with HTTP-only cookies
+- **Secure Authentication**: JWT-based authentication with localStorage storage
 
 ### For Recruiters
 - **Candidate Discovery**: Browse and search through a curated pool of candidates
@@ -216,11 +216,11 @@ npm run build
 ## 🔧 Configuration
 
 ### Security Features
-- **JWT Authentication**: Secure token-based authentication
-- **HTTP-Only Cookies**: Prevents XSS attacks
+- **JWT Authentication**: Secure token-based authentication with localStorage
+- **Authorization Headers**: Bearer token authentication for API requests
 - **CORS Protection**: Configurable cross-origin resource sharing
 - **Password Encryption**: BCrypt hashing for secure password storage
-- **Cross-Origin Cookies**: Secure authentication for deployed applications
+- **Cross-Platform Compatibility**: Works on all devices including iPhone Safari and incognito mode
 
 ### AI Integration
 - **GitHub Models**: Utilizes OpenAI GPT-4 via GitHub's AI models
@@ -291,14 +291,14 @@ The application automatically adapts to different environments:
 ### Common Issues
 
 #### Authentication Issues
-- **Problem**: Cookies not being set in production/incognito/mobile Safari
-- **Solution**: Ensure `secure: true` and `sameSite: "None"` for cross-origin deployments
-- **Note**: `sameSite: "None"` is required for cross-origin cookies to work in modern browsers
-
-#### Cross-Origin Cookie Issues
 - **Problem**: Authentication fails in incognito mode or mobile Safari
-- **Solution**: Backend uses `sameSite("None")` and `secure(true)` cookie settings
-- **Requirement**: HTTPS is mandatory when using `sameSite("None")`
+- **Solution**: Switched to localStorage-based authentication for universal compatibility
+- **Note**: localStorage works across all browsers and privacy modes
+
+#### Cross-Origin Authentication
+- **Problem**: Cross-origin cookies blocked by modern browsers
+- **Solution**: Using Authorization headers with Bearer tokens stored in localStorage
+- **Benefit**: Works on all devices including iPhone Safari, Android, and incognito modes
 
 #### Resume Parsing Failures
 - **Problem**: AI parsing returns incomplete data
@@ -319,11 +319,11 @@ The application automatically adapts to different environments:
 - Test API endpoints using tools like Postman
 
 ### Testing Authentication
-- **Local Development**: Works with HTTP and `sameSite: "Lax"`
-- **Production/Cross-Origin**: Requires HTTPS and `sameSite: "None"`
-- **Incognito Mode**: Test cross-origin cookie behavior
-- **Mobile Safari**: Known to be strict with cross-origin cookies
-- **Cookie Inspection**: Use browser DevTools → Application → Cookies to verify
+- **Local Development**: Works with localStorage
+- **Production/Cross-Origin**: Fully compatible with localStorage approach
+- **Incognito Mode**: Full support - no restrictions
+- **Mobile Safari**: Complete compatibility including iPhone/iPad
+- **Token Inspection**: Use browser DevTools → Application → Local Storage to verify tokens
 
 ## 🤝 Contributing
 

@@ -1,39 +1,37 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import axios from "axios";
 import { Loader2 } from "lucide-react";
 import { useConfig } from "../configContext/ConfigProvider";
 
 const ProtectedRoutes = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
-  const [authenticated, setAuthenticated] = useState(false);
-  const { server } = useConfig();
-    useEffect(()=>{
-        console.log("auth",authenticated)
-    },[authenticated])
+  const { loggedIn, setLoggedIn } = useConfig();
+  
   useEffect(() => {
-    setLoading(true);
-    axios
-      .get(`${server}/users/token`, {
-        withCredentials: true, 
-      })
-      .then((res) => {
-        console.log("data",res);
-        setAuthenticated(true);
-      })
-      .catch(() => {
-        setAuthenticated(false);
-      })
-      .finally(() => {
+    const checkAuth = () => {
+      setLoading(true);
+      const token = localStorage.getItem('authToken');
+      
+      if (!token) {
+        setLoggedIn(false);
         setLoading(false);
-      });
-  }, []);
+        return;
+      }
+
+      // If token exists, assume user is logged in
+      // The API interceptor will handle invalid tokens
+      setLoggedIn(true);
+      setLoading(false);
+    };
+
+    checkAuth();
+  }, [setLoggedIn]);
 
     if(loading) return (<>
     <div className="w-full h-screen flex justify-center items-center">  <Loader2 className='animate-spin w-[4rem] h-[4rem] md:w-[10rem] md:h-[10rem] text-green-600'/></div>
 
   </>)
-  if (!authenticated) return <Navigate to="/login" replace />;
+  if (!loggedIn) return <Navigate to="/login" replace />;
 
   return <>{children}</>;
 };

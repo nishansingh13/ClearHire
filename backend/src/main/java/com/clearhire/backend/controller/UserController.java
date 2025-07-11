@@ -4,11 +4,11 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.clearhire.backend.Repository.UserRepository;
@@ -46,6 +46,14 @@ public class UserController {
   @Autowired
   private JwtUtil  jwtUtil;
   
+  // Helper method to extract JWT token from Authorization header
+  private String extractToken(String authHeader) {
+      if (authHeader != null && authHeader.startsWith("Bearer ")) {
+          return authHeader.substring(7);
+      }
+      return "";
+  }
+  
     @PostMapping("/users/register")
     public ResponseEntity<?> registerUser(@RequestBody User user){
         return  userService.registerUser(user);
@@ -61,7 +69,8 @@ public class UserController {
        return userService.logoutUser();
     }
     @GetMapping("/users/token")
-     public ResponseEntity<?> getToken(@CookieValue(name="jwt",defaultValue = "") String jwt) {
+     public ResponseEntity<?> getToken(@RequestHeader(name="Authorization", defaultValue = "") String authHeader) {
+        String jwt = extractToken(authHeader);
         if(jwt==null || jwt.isEmpty()){
             return ResponseEntity.status(401).body("No token found");
         }
@@ -78,13 +87,15 @@ public class UserController {
         
     }
     @PutMapping("/users/update")
-    public ResponseEntity<?> updateUser(@RequestBody  SignUpData user, @CookieValue(name="jwt", defaultValue = "") String jwt) {
+    public ResponseEntity<?> updateUser(@RequestBody SignUpData user, @RequestHeader(name="Authorization", defaultValue = "") String authHeader) {
+        String jwt = extractToken(authHeader);
         return userService.updateUser(user, jwt);
         
     }
 
     @GetMapping("/users/profile")
-    public ResponseEntity<?> getUserProfile(@CookieValue(name="jwt", defaultValue = "") String jwt) {
+    public ResponseEntity<?> getUserProfile(@RequestHeader(name="Authorization", defaultValue = "") String authHeader) {
+        String jwt = extractToken(authHeader);
         if(jwt.isEmpty()) {
             return ResponseEntity.status(401).body("Token is empty");
         }

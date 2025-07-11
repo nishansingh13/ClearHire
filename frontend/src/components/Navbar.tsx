@@ -2,34 +2,40 @@ import { Link } from 'react-router-dom';
 import  {  useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useConfig } from './configContext/ConfigProvider';
-import axios from 'axios';
 import { Loader2 } from 'lucide-react';
+import API from '../utils/api';
 
 function Navbar() {
     const { loggedIn,setLoggedIn, server } = useConfig();
-    const [loading,setLoading] = useState(false);
-  
-    useEffect(()=>{
+    const [loading,setLoading] = useState(false);    useEffect(()=>{
         const validateLogin = async()=>{
 
       try{
         setLoading(true);
-        const res = await axios.get(`${server}/users/token`,{
-          withCredentials:true
-        });
-        if(res.status==200){
-          setLoggedIn(true);
+        const token = localStorage.getItem('authToken');
+        if (token) {
+          const res = await API.get(`${server}/users/token`);
+          if(res.status==200){
+            setLoggedIn(true);
+          }
+        } else {
+          setLoggedIn(false);
         }
       }
       catch(err){
         console.error(err);
+        // Token is invalid
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userEmail');
+        localStorage.removeItem('userName');
+        setLoggedIn(false);
       }
       finally{
         setLoading(false);
       }
     }
-      validateLogin();
-    },[])
+    validateLogin();
+    },[server, setLoggedIn])
 
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);

@@ -1,13 +1,12 @@
 package com.clearhire.backend.service;
 import java.util.Optional;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.CookieValue;
 
 import com.clearhire.backend.Repository.UserRepository;
 import com.clearhire.backend.models.SignUpData;
@@ -53,45 +52,30 @@ public class UserService {
         // Generate JWT token
         String token = jwtUtil.generateToken(email);
         
-        // Create HTTP-only cookie with JWT token
-        ResponseCookie jwtCookie = ResponseCookie.from("jwt", token)
-                .secure(true) // Set to true in production with HTTPS
-                .path("/")
-                .maxAge(24 * 60 * 60) // 24 hours
-                .sameSite("None") // Required for cross-origin requests
-                .httpOnly(true)
-                .build();
+        // Return token in response body for localStorage
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Login successful");
+        response.put("token", token);
+        response.put("email", email);
+        response.put("name", user.getName());
         
-        // Return response with cookie header
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                .body("Login successful yo");
+        return ResponseEntity.ok(response);
     }
     return ResponseEntity.status(401).body("Invalid credentials");
 }
 
-    // Logout method to clear JWT cookie
+    // Logout method - localStorage handles token removal on frontend
     public ResponseEntity<?> logoutUser() {
-        ResponseCookie jwtCookie = ResponseCookie.from("jwt", "")
-                .secure(true) 
-                .path("/")
-                .maxAge(0)
-                .sameSite("None") // Required for cross-origin requests
-                .httpOnly(true)
-                .build();
-        
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                .body("Logout successful");
+        return ResponseEntity.ok("Logout successful");
     }
     public boolean validateToken(String token){
       return jwtUtil.validateToken(token, jwtUtil.extractemail(token));
     }
 
-    public ResponseEntity<?> updateUser(SignUpData user, @CookieValue(value="jwt", defaultValue = "") String jwt) {
-       if(!validateToken(jwt))  return ResponseEntity.status(401).body("Invalid token");
-       if(jwt.isEmpty()) return ResponseEntity.status(401).body("Token is empty");
-       Optional<User> existingUser = userRepository.findById(jwtUtil.extractemail(jwt));
+    public ResponseEntity<?> updateUser(SignUpData user, String token) {
+       if(!validateToken(token))  return ResponseEntity.status(401).body("Invalid token");
+       if(token.isEmpty()) return ResponseEntity.status(401).body("Token is empty");
+       Optional<User> existingUser = userRepository.findById(jwtUtil.extractemail(token));
          if(existingUser.isEmpty()) {
               return ResponseEntity.status(404).body("User not found");
          }

@@ -110,4 +110,8 @@ public class UserController {
         return ResponseEntity.ok(user.get());
     }
 
+    @GetMapping("/ping")
+    public ResponseEntity<?> ping() {
+        return ResponseEntity.ok("Pong");
+    }
 }

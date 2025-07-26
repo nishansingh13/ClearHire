@@ -384,7 +384,7 @@ function Login() {
                 />
               </div>
             )}
-            <button type="button" onClick={()=>handleGuest()} className='bg-green-600 text-white py-2 px-4 rounded-lg cursor-pointer font-bold'>Login as Guest</button>
+            <button type="button" onClick={()=>handleGuest()} className='bg-blue-600 text-white py-3 px-4 rounded-lg cursor-pointer font-bold'>Login as Guest</button>
           </div>
 
           {/* Remember Me & Forgot Password (Only for Login) */}

@@ -106,6 +106,25 @@ public class UserService {
          
 
     }
+  public ResponseEntity<?> guestLogin(User user) {
+    String email = user.getEmail();
+    User existingUser = userRepository.findById(email).orElse(null);
+
+    if (existingUser == null) {
+        user.setPassword(passwordEncoder.encode("guestpassword"));
+        userRepository.save(user);
+        existingUser = user;
+    }
+
+    String token = jwtUtil.generateToken(existingUser.getEmail());
+    Map<String, String> response = new HashMap<>();
+    response.put("message", "Guest login successful");
+    response.put("token", token);
+    response.put("email", existingUser.getEmail());
+    response.put("name", existingUser.getName());
+    return ResponseEntity.ok(response);
+}
+
 
    
 }

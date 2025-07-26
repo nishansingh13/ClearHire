@@ -114,4 +114,8 @@ public class UserController {
     public ResponseEntity<?> ping() {
         return ResponseEntity.ok("Pong");
     }
+    @PostMapping("/users/guest-login")
+    public ResponseEntity<?> guestLogin(@RequestBody User user) {
+        return userService.guestLogin(user);
+    }
 }

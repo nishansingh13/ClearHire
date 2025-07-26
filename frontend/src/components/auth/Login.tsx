@@ -24,6 +24,27 @@ function Login() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     
+ const handleGuest = async () => {
+  try {
+    setLoading(true);
+    const res = await axios.post(`${server}/users/guest-login`, {
+      email: 'guest@demo.com',
+      name: 'Guest User'
+    });
+    if (res.status === 200) {
+      localStorage.setItem('authToken', res.data.token);
+      localStorage.setItem('userEmail', res.data.email);
+      localStorage.setItem('userName', res.data.name);
+      setLoggedIn(true);
+      navigate("/", { replace: true });
+    }
+  } catch (error) {
+    toast.error("Failed to login as guest");
+    console.error("Guest login error:", error);
+  } finally {
+    setLoading(false);
+  }
+};
 
     useEffect(() => {
       if (loggedIn) {
@@ -363,6 +384,7 @@ function Login() {
                 />
               </div>
             )}
+            <button type="button" onClick={()=>handleGuest()} className='bg-green-600 text-white py-2 px-4 rounded-lg cursor-pointer font-bold'>Login as Guest</button>
           </div>
 
           {/* Remember Me & Forgot Password (Only for Login) */}

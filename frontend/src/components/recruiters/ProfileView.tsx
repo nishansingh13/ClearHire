@@ -1,7 +1,7 @@
 import axios from 'axios';
 import Navbar from '../Navbar';
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useConfig } from '../configContext/ConfigProvider';
 import { matchingService, type MatchResult, getAvailableRoles } from '../../utils/matchingService';
 
@@ -18,12 +18,17 @@ interface Resume {
 function ProfileView() {
   const { email } = useParams<{ email: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { server } = useConfig();
   const [resumeData, setResumeData] = useState<Resume | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [matchResult, setMatchResult] = useState<MatchResult | null>(null);
   const [targetRole, setTargetRole] = useState<string>('Full Stack Developer');
+
+  // Get passed match result and target role from navigation state
+  const passedMatchResult = location.state?.matchResult as MatchResult | undefined;
+  const passedTargetRole = location.state?.targetRole as string | undefined;
 
   const calculateMatch = (resume: Resume, role: string) => {
     const match = matchingService.calculateMatch(
@@ -77,7 +82,14 @@ function ProfileView() {
         
         if (res.data) {
           setResumeData(res.data);
-          calculateMatch(res.data, targetRole);
+          
+          // Use passed match result and target role if available, otherwise calculate
+          if (passedMatchResult && passedTargetRole) {
+            setMatchResult(passedMatchResult);
+            setTargetRole(passedTargetRole);
+          } else {
+            calculateMatch(res.data, targetRole);
+          }
         } else {
           setError('Resume not found');
         }
@@ -90,7 +102,7 @@ function ProfileView() {
     };
 
     fetchProfile();
-  }, [email, server, targetRole]);
+  }, [email, server, passedMatchResult, passedTargetRole, targetRole]);
 
   // Recalculate match when target role changes
   useEffect(() => {
@@ -158,7 +170,13 @@ function ProfileView() {
               </label>
               <select
                 value={targetRole}
-                onChange={(e) => setTargetRole(e.target.value)}
+                onChange={(e) => {
+                  const newRole = e.target.value;
+                  setTargetRole(newRole);
+                  if (resumeData) {
+                    calculateMatch(resumeData, newRole);
+                  }
+                }}
                 className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent min-w-[200px]"
               >
                 {getAvailableRoles().map((role) => (

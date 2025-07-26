@@ -26,7 +26,7 @@ function ProfileView() {
   const [matchResult, setMatchResult] = useState<MatchResult | null>(null);
   const [targetRole, setTargetRole] = useState<string>('Full Stack Developer');
 
-  // Get passed match result and target role from navigation state
+
   const passedMatchResult = location.state?.matchResult as MatchResult | undefined;
   const passedTargetRole = location.state?.targetRole as string | undefined;
 

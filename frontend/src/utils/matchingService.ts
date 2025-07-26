@@ -700,49 +700,32 @@ const ROLE_REQUIREMENTS: Record<string, JobRequirements> = {
   }
 };
 
-// Experience level mapping (for future use)
-// const EXPERIENCE_LEVELS = {
-//   'Entry Level (0-2 years)': 'junior',
-//   'Mid Level (2-5 years)': 'mid',
-//   'Senior Level (5-8 years)': 'senior',
-//   'Lead/Principal (8+ years)': 'lead'
-// };
 
 export class CandidateMatchingService {
   
-  // Normalize skills for comparison
   private normalizeSkill(skill: string): string {
     return skill.toLowerCase().trim().replace(/[^\w\s.-]/g, '');
   }
 
-  // More precise skill matching to avoid false positives
   private isSkillMatch(candidateSkill: string, requiredSkill: string): boolean {
-    // Exact match
     if (candidateSkill === requiredSkill) return true;
-    
-    // Handle common variations
     const candWords = candidateSkill.split(/\s+/);
     const reqWords = requiredSkill.split(/\s+/);
     
-    // For single word skills, require exact match or meaningful substring
     if (reqWords.length === 1 && candWords.length === 1) {
-      // Only match if one contains the other AND the substring is meaningful (at least 3 chars)
       if (reqWords[0].length >= 3 && candWords[0].includes(reqWords[0])) return true;
       if (candWords[0].length >= 3 && reqWords[0].includes(candWords[0])) return true;
       return false;
     }
     
-    // For multi-word skills, check if key words match
     if (reqWords.length > 1) {
       const keyWords = reqWords.filter(word => word.length >= 3); // Skip short words like "a", "the", "of"
       const matchedWords = keyWords.filter(word => 
         candWords.some(candWord => candWord.includes(word) || word.includes(candWord))
       );
-      // Require at least 50% of key words to match
       return matchedWords.length >= Math.ceil(keyWords.length * 0.5);
     }
     
-    // For candidate multi-word skills against single required skill
     if (candWords.length > 1 && reqWords.length === 1) {
       return candWords.some(word => 
         (word.length >= 3 && reqWords[0].includes(word)) || 
@@ -753,7 +736,6 @@ export class CandidateMatchingService {
     return false;
   }
 
-  // Calculate skills match score
   private calculateSkillsScore(candidateSkills: string[], requirements: JobRequirements): {
     score: number;
     matched: string[];
@@ -763,32 +745,28 @@ export class CandidateMatchingService {
     const normalizedRequiredSkills = requirements.requiredSkills.map(skill => this.normalizeSkill(skill));
     const normalizedPreferredSkills = (requirements.preferredSkills || []).map(skill => this.normalizeSkill(skill));
 
-    // Find exact matches - return the CANDIDATE skills that match, not the required skills
     const exactMatchedCandidateSkills: string[] = [];
     const exactMatchedRequiredSkills: string[] = [];
     
     for (const reqSkill of normalizedRequiredSkills) {
       for (const candSkill of normalizedCandidateSkills) {
-        // More precise matching: either exact match or meaningful substring match
         const isMatch = this.isSkillMatch(candSkill, reqSkill);
         if (isMatch) {
           exactMatchedCandidateSkills.push(candSkill);
           exactMatchedRequiredSkills.push(reqSkill);
-          break; // Only count each required skill once
+          break; 
         }
       }
     }
 
-    // Find related skills (from same category) - return candidate skills that provide coverage
     const relatedMatchResult = this.findRelatedSkills(normalizedCandidateSkills, normalizedRequiredSkills);
     
-    // Find preferred skill matches - return candidate skills that match
     const preferredMatchedCandidateSkills: string[] = [];
     for (const prefSkill of normalizedPreferredSkills) {
       for (const candSkill of normalizedCandidateSkills) {
         if (this.isSkillMatch(candSkill, prefSkill)) {
           preferredMatchedCandidateSkills.push(candSkill);
-          break; // Only count each preferred skill once
+          break;
         }
       }
     }
@@ -796,14 +774,13 @@ export class CandidateMatchingService {
     const totalRequiredMatches = exactMatchedRequiredSkills.length + relatedMatchResult.coveredRequiredSkills.length;
     const requiredSkillsCount = normalizedRequiredSkills.length;
     
-    // Base score from required skills
+
     let skillsScore = (totalRequiredMatches / requiredSkillsCount) * 100;
     
-    // Bonus for preferred skills (up to 15% bonus)
+    
     const preferredBonus = Math.min((preferredMatchedCandidateSkills.length / (normalizedPreferredSkills.length || 1)) * 15, 15);
     skillsScore = Math.min(skillsScore + preferredBonus, 100);
 
-    // Return the CANDIDATE skills that provided matches, not the required skills
     const allMatchedCandidateSkills = [
       ...exactMatchedCandidateSkills, 
       ...relatedMatchResult.matchedCandidateSkills, 
@@ -817,12 +794,12 @@ export class CandidateMatchingService {
 
     return {
       score: Math.round(skillsScore),
-      matched: [...new Set(allMatchedCandidateSkills)], // Candidate skills that matched
-      missing: [...new Set(missingRequiredSkills)]       // Required skills that are missing
+      matched: [...new Set(allMatchedCandidateSkills)], 
+      missing: [...new Set(missingRequiredSkills)]       
     };
   }
 
-  // Find related skills from same category
+
   private findRelatedSkills(candidateSkills: string[], requiredSkills: string[]): {
     matchedCandidateSkills: string[];
     coveredRequiredSkills: string[];
@@ -852,12 +829,11 @@ export class CandidateMatchingService {
     };
   }
 
-  // Calculate experience level match
+
   private calculateExperienceScore(candidateExperience: string[], targetRole: string): number {
     const roleRequirements = ROLE_REQUIREMENTS[targetRole];
-    if (!roleRequirements) return 50; // Default score if role not found
+    if (!roleRequirements) return 50; 
 
-    // Estimate experience level from experience array length and content
     const experienceCount = candidateExperience.length;
     const experienceText = candidateExperience.join(' ').toLowerCase();
     
@@ -875,30 +851,27 @@ export class CandidateMatchingService {
 
     const requiredLevel = roleRequirements.experienceLevel;
     
-    // Score based on level match
+  
     if (estimatedLevel === requiredLevel) return 100;
     if ((estimatedLevel === 'mid' && requiredLevel === 'senior') || 
         (estimatedLevel === 'senior' && requiredLevel === 'mid')) return 80;
     if ((estimatedLevel === 'junior' && requiredLevel === 'mid') || 
         (estimatedLevel === 'mid' && requiredLevel === 'junior')) return 70;
     
-    return 50; // Significant mismatch
+    return 50; 
   }
 
-  // Calculate role alignment score
+
   private calculateRoleScore(candidateRole: string, targetRole: string): number {
     const candRole = candidateRole.toLowerCase();
     const targRole = targetRole.toLowerCase();
     
-    // Exact match
     if (candRole === targRole) return 100;
     
-    // Partial matches
     const roleKeywords = targRole.split(' ');
     const matches = roleKeywords.filter(keyword => candRole.includes(keyword)).length;
     const partialScore = (matches / roleKeywords.length) * 80;
     
-    // Role family matches
     const roleFamilies = {
       'developer': ['developer', 'engineer', 'programmer'],
       'full stack': ['full stack', 'fullstack', 'full-stack'],
@@ -916,7 +889,6 @@ export class CandidateMatchingService {
     return Math.max(partialScore, 30);
   }
 
-  // Main matching function
   public calculateMatch(
     candidateSkills: string[],
     candidateExperience: string[],
@@ -925,12 +897,10 @@ export class CandidateMatchingService {
   ): MatchResult {
     const requirements = ROLE_REQUIREMENTS[targetRole] || ROLE_REQUIREMENTS['Full Stack Developer'];
     
-    // Calculate individual scores
     const skillsResult = this.calculateSkillsScore(candidateSkills, requirements);
     const experienceScore = this.calculateExperienceScore(candidateExperience, targetRole);
     const roleScore = this.calculateRoleScore(candidateRole, targetRole);
     
-    // Weighted overall score
     const overallScore = Math.round(
       (skillsResult.score * 0.6) +
       (experienceScore * 0.25) +
@@ -951,7 +921,6 @@ export class CandidateMatchingService {
     };
   }
 
-  // Get match description
   public getMatchDescription(score: number): {
     level: string;
     description: string;
@@ -985,24 +954,21 @@ export class CandidateMatchingService {
   }
 }
 
-// Allow customization of role requirements
+
 export const updateRoleRequirements = (role: string, requirements: Partial<JobRequirements>) => {
   ROLE_REQUIREMENTS[role] = {
     ...ROLE_REQUIREMENTS[role],
     ...requirements,
-    role // Ensure role name is always set
+    role
   };
 };
 
-// Get current role requirements
 export const getRoleRequirements = (role: string): JobRequirements | undefined => {
   return ROLE_REQUIREMENTS[role];
 };
 
-// Get all available roles
 export const getAvailableRoles = (): string[] => {
   return Object.keys(ROLE_REQUIREMENTS);
 };
 
-// Export singleton instance
 export const matchingService = new CandidateMatchingService();

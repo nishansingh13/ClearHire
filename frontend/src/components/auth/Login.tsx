@@ -74,13 +74,13 @@ function Login() {
             }
             else {
               if (isLogin && res.data.token) {
-                // Store authentication data in localStorage
+              
                 localStorage.setItem('authToken', res.data.token);
                 localStorage.setItem('userEmail', res.data.email);
                 localStorage.setItem('userName', res.data.name);
                
                 
-                // Update global auth state
+
                 setLoggedIn(true);
                 
                 toast.success("Login successful");

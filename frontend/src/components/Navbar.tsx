@@ -53,18 +53,16 @@ function Navbar() {
           </div>
           <div className='hidden md:block'>
             <div className='ml-10 flex items-baseline space-x-8'>
-              <Link to="/top-candidates" className='text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors'>Top 1%</Link>
-              <Link to ="/blog" className='text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors'>Blog</Link>
-              <a href="#" className='text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors'>Clients</a>
-              <a href="#" className='text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors'>Other Services</a>
+              <Link to="/top-candidates" className='text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors'>Browse Candidates</Link>
+              <Link to="/about" className='text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors'>About</Link>
             </div>
           </div>
 
           {/* Desktop Actions */}
           <div className='hidden md:flex items-center space-x-4'>
-            <Link to ="/apply" className='text-gray-700 hover:text-blue-600 text-sm font-medium transition-colors'>Apply as Talent</Link>
-            <button className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors" onClick={() => navigate("/top-candidates")}>
-              Hire Top Talent
+            <Link to ="/apply" className='text-gray-700 hover:text-blue-600 text-sm font-medium transition-colors'>Join as Candidate</Link>
+            <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors" onClick={() => navigate("/top-candidates")}>
+              Find Talent
             </button>
             {!loggedIn?(
                 <button 
@@ -105,14 +103,15 @@ function Navbar() {
       {isMenuOpen && (
         <div className='md:hidden bg-white border-t border-gray-200'>
           <div className='px-2 pt-2 pb-3 space-y-1'>
-            <a href="#" className='text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium transition-colors'>Top 1%</a>
-            <a href="#" className='text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium transition-colors'>Other Services</a>
-            <a href="#" className='text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium transition-colors' >Clients</a>
-            <a href="#" className='text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium transition-colors'>Blog</a>
-            <a href="#" className='text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium transition-colors'>Apply as a Talent</a>
+            <Link to="/top-candidates" className='text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium transition-colors'>Browse Candidates</Link>
+            <Link to="/about" className='text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium transition-colors'>About</Link>
+            <Link to="/apply" className='text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium transition-colors'>Join as Candidate</Link>
             <div className='px-3 py-2 space-y-2'>
-              <button className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors">
-                Hire Top Talent
+              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors" onClick={() => navigate("/top-candidates")}>
+                Find Talent
+              </button>
+              <button className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md text-sm transition-colors" onClick={() => navigate("/login")}>
+                For Recruiters
               </button>
               {!loggedIn ?(
               <button 
@@ -122,7 +121,13 @@ function Navbar() {
                 Log in
               </button>
               ) :(
-                <>dsd</>
+                <Link to="/account" className='block'>
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </div>
+                </Link>
               )}
             </div>
           </div>

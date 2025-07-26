@@ -10,6 +10,7 @@ import HireCandidates from './components/recruiters/HireCandidates'
 import ProfileView from './components/recruiters/ProfileView'
 import Blog from './components/extras/Blog'
 import ProtectedRoutes from './components/protect/ProtectedRoutes'
+import HowItWorks from './components/HowItWorks'
 function App() {
  
 
@@ -19,13 +20,14 @@ function App() {
     <Toaster position='top-center' richColors />
     <Routes>
       
-      <Route path='/' element={<ProtectedRoutes><Home/></ProtectedRoutes>}/>
+      <Route path='/about' element={<ProtectedRoutes><Home/></ProtectedRoutes>}/>
       <Route path='/login' element={<Login/>}/>
       <Route path='/apply' element={<ProtectedRoutes><ClientMainPage/></ProtectedRoutes>}/>
       <Route path='/account' element={<ProtectedRoutes><ClientAccount/></ProtectedRoutes>}/>
       <Route path = "/top-candidates" element={<ProtectedRoutes><HireCandidates/></ProtectedRoutes>}/>
       <Route path="/profile/:email" element={<ProtectedRoutes><ProfileView/></ProtectedRoutes>}/>
       <Route path="/blog" element={<Blog/>}/>
+      <Route path="/" element={<ProtectedRoutes><HowItWorks/></ProtectedRoutes>}/>
 
       </Routes>
       </BrowserRouter>

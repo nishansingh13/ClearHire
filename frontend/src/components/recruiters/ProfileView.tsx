@@ -185,9 +185,7 @@ function ProfileView() {
                   </option>
                 ))}
               </select>
-              <div className="text-xs text-gray-500">
-                Match score will update based on selected role requirements
-              </div>
+            
             </div>
           </div>
 

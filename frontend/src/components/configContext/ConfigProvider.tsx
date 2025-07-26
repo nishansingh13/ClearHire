@@ -11,7 +11,7 @@ const ConfigContext = createContext<Config | null>(null);
 
 export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
   const [loggedIn, setLoggedIn] = useState(false);
-  const server= "http://localhost:8080"; // Replace with your server URL
+  const server= "https://clearhire.onrender.com";
 
   // Check if user is logged in on app load
   useEffect(() => {

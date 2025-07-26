@@ -26,8 +26,6 @@ function ProfileView() {
   const getDefaultAvatar = () => {
     return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiByeD0iNTAiIGZpbGw9IiNGM0Y0RjYiLz4KPHN2ZyB4PSIyNSIgeT0iMjAiIHdpZHRoPSI1MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSIjOUI5QkE0Ij4KICA8cGF0aCBkPSJNMTIgMTJjMi4yMSAwIDQtMS43OSA0LTRzLTEuNzktNC00LTQtNCA1LjItNCA0IDEuNzkgNCA0IDR6bTAgMmMtMi42NyAwLTggMS4zNC04IDR2MmgxNnYtMmMwLTIuNjYtNS4zMy00LTgtNHoiLz4KICA8L3N2Zz4KPC9zdmc+';
   };
-
-  // Parse experience text to extract title and description
   const parseExperience = (experience: string) => {
     const match = experience.match(/\*\*(.*?)\*\*:\s*(.*)/);
     if (match) {
@@ -41,6 +39,16 @@ function ProfileView() {
       description: experience
     };
   };
+  const formatBoldText = (text: string) => {
+  const parts = text.split(/(\*\*.*?\*\*)/); 
+  return parts.map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={i}>{part.slice(2, -2)}</strong>;
+    }
+    return <span key={i}>{part}</span>;
+  });
+};
+
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -191,7 +199,7 @@ function ProfileView() {
                     return (
                       <div key={index} className="border-l-4 border-green-500 pl-6 pb-6">
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">{parsed.title}</h3>
-                        <p className="text-gray-700 leading-relaxed">{parsed.description}</p>
+                        <p className="text-gray-700 leading-relaxed">{formatBoldText(parsed.description)}</p>
                       </div>
                     );
                   })}

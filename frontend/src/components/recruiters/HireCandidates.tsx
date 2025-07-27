@@ -94,9 +94,10 @@ function HireCandidates() {
     return (
       <>
         <Navbar />
-        <div className="w-full max-w-7xl mx-auto mt-10 px-4 text-center">
-          <div className="text-2xl font-semibold text-gray-600">Loading candidates...</div>
-        </div>
+        <div className="flex flex-col gap-2 w-full h-[25rem] justify-center items-center">
+           <div className="animate-spin rounded-full w-12 h-12 md:w-16 md:h-16 border-4 border-gray-200 border-t-blue-600"></div>
+           <div>Loading Candidates..</div>
+          </div>
       </>
     );
   }

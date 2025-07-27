@@ -13,7 +13,6 @@ export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
   const [loggedIn, setLoggedIn] = useState(false);
   const server= "https://clearhire.onrender.com";
 
-  // Check if user is logged in on app load
   useEffect(() => {
     const token = localStorage.getItem('authToken');
     if (token) {

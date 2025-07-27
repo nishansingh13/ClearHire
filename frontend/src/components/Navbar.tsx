@@ -7,11 +7,10 @@ import API from '../utils/api';
 
 function Navbar() {
     const { loggedIn,setLoggedIn, server } = useConfig();
-    const [loading,setLoading] = useState(false);    useEffect(()=>{
+       useEffect(()=>{
         const validateLogin = async()=>{
 
       try{
-        setLoading(true);
         const token = localStorage.getItem('authToken');
         if (token) {
           const res = await API.get(`${server}/users/token`);
@@ -30,19 +29,14 @@ function Navbar() {
         localStorage.removeItem('userName');
         setLoggedIn(false);
       }
-      finally{
-        setLoading(false);
-      }
+     
     }
     validateLogin();
     },[server, setLoggedIn])
 
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  if(loading) return (<>
-    <div className="w-full h-screen flex justify-center items-center"><div className="animate-spin rounded-full w-[4rem] h-[4rem] md:w-[8rem] md:h-[8rem] border-b-2 border-green-600 mx-auto mb-4"></div></div>
 
-  </>)
   return (
     <nav className='bg-white shadow-sm border-b'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>

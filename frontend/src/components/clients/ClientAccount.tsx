@@ -17,6 +17,7 @@ interface UserProfile {
 
 function ClientAccount() {
   const {setLoggedIn, server} = useConfig();
+  const [loading,setLoading] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -35,6 +36,7 @@ function ClientAccount() {
 
   const fetchUserProfile = useCallback(async () => {
     try {
+      setLoading(true);
       const res = await API.get(`${server}/users/profile`);
       const data = res.data;
       if(res.status == 200) {
@@ -58,6 +60,8 @@ function ClientAccount() {
     } catch (error) {
       console.error('Error fetching profile:', error);
       toast.error('Failed to load profile');
+    } finally {
+      setLoading(false);
     }
   }, [server]);
 
@@ -142,7 +146,7 @@ function ClientAccount() {
     setSuccess('');
   };
 
-
+ 
   return (
     <>
     <Navbar/>
@@ -164,9 +168,11 @@ function ClientAccount() {
               Logout
             </button>
           </div>
-
+        
           {/* Main Profile Card */}
+          {!loading?(
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          
             {/* Profile Header with App Theme */}
             <div className="bg-white px-8 py-12 border-b border-gray-200">
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
@@ -479,6 +485,11 @@ function ClientAccount() {
               )}
             </div>
           </div>
+          ):<div className="flex flex-col gap-2 w-full h-[25rem] justify-center items-center">
+           <div className="animate-spin rounded-full w-12 h-12 md:w-16 md:h-16 border-4 border-gray-200 border-t-green-600"></div>
+           <div>Fetching profile..</div>
+          </div>
+}
         </div>
       </div>
 

@@ -11,7 +11,7 @@ const ConfigContext = createContext<Config | null>(null);
 
 export const ConfigProvider = ({ children }: { children: React.ReactNode }) => {
   const [loggedIn, setLoggedIn] = useState(false);
-  const server= "https://clearhire.onrender.com";
+  const server= "https://clearhire-jjyl.onrender.com";
 
   useEffect(() => {
     const token = localStorage.getItem('authToken');
